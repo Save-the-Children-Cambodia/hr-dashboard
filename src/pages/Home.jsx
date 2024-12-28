@@ -4,10 +4,14 @@ import Attendance from "../components/Elliot";
 import EditProject from "../components/EditProject";
 import EditPerson from "../components/EditPerson";
 import "../styles/home.css"
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -45,7 +49,7 @@ const Home = () => {
                   };
                   fileInput.click();
                 }}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-sm bg-custom-purple-500 shadow-sm hover:bg-custom-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md font-semibold text-sm bg-custom-purple-500 shadow-sm hover:bg-custom-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
  viewBox="0 0 512.000000 512.000000"
@@ -82,7 +86,7 @@ c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
                   document.body.removeChild(link);
                   URL.revokeObjectURL(url);
                 }}
-                className="inline-flex items-center px-4 py-2 bg-gray-300 border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                className="inline-flex items-center px-6 py-3 bg-gray-300 border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
  viewBox="0 0 512.000000 512.000000"
@@ -108,14 +112,26 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
                 <span className="text-black pl-2">Export Team Data</span>
               </button>
               <button 
-                onClick={() => setActiveComponent('settings')} 
-                className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }} 
+                className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-sm text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg 
+                  className="w-5 h-5 mr-2" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+                  />
                 </svg>
-                Account
+                Logout
               </button>
             </div>
           </div>
