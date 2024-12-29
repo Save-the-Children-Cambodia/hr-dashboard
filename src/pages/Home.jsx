@@ -7,6 +7,7 @@ import "../styles/home.css"
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import NotificationPopup from '../components/NotificationPopup';
+import CustomChatbot from '../components/CustomChatbot';
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
@@ -407,6 +408,8 @@ fill="#606163" stroke="none">
         onClose={() => setShowNotifications(false)}
         markAsRead={markAsRead}
       />
+
+      <CustomChatbot />
     </div>
   );
 };
