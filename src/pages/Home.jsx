@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Member1 from "../components/Panhathun";
 import Attendance from "../components/Elliot";
 import EditProject from "../components/EditProject";
@@ -6,12 +6,16 @@ import EditPerson from "../components/EditPerson";
 import "../styles/home.css"
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import NotificationPopup from '../components/NotificationPopup';
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -27,6 +31,36 @@ const Home = () => {
         return <Member1 />;
     }
   };
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/notifications/');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      const data = await response.json();
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.is_read).length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  const markAsRead = async (notificationId) => {
+    try {
+      await fetch(`http://localhost:8000/api/notifications/${notificationId}/read/`, {
+        method: 'POST'
+      });
+      fetchNotifications(); // Refresh notifications
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -132,6 +166,36 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
                   />
                 </svg>
                 Logout
+              </button>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative"
+              >
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+                <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512.000000 512.000000"
+                  preserveAspectRatio="xMidYMid meet">
+
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                  fill="#000000" stroke="none">
+                  <path d="M2480 5104 c-19 -8 -48 -27 -63 -42 -55 -52 -62 -75 -67 -236 l-5
+                  -149 -92 -18 c-176 -36 -367 -117 -533 -227 -117 -78 -318 -280 -399 -401
+                  -106 -160 -182 -338 -224 -526 -17 -80 -20 -143 -27 -570 -8 -530 -13 -585
+                  -75 -771 -76 -230 -190 -409 -378 -597 -164 -162 -182 -197 -182 -342 0 -89 3
+                  -106 27 -156 53 -107 158 -186 277 -209 77 -14 3567 -14 3647 1 114 21 219
+                  101 272 208 24 50 27 67 27 156 0 144 -20 182 -173 333 -130 128 -188 201
+                  -258 319 -88 147 -147 308 -179 483 -15 77 -19 184 -25 575 -6 428 -9 490 -27
+                  570 -67 298 -194 527 -412 746 -216 215 -463 351 -744 408 l-92 18 -5 149 c-5
+                  161 -12 184 -67 236 -58 56 -151 73 -223 42z"/>
+                  <path d="M1780 625 c0 -33 62 -182 104 -249 172 -274 506 -422 818 -362 219
+                  42 402 164 526 351 44 66 111 220 112 258 0 16 -44 17 -780 17 -680 0 -780 -2
+                  -780 -15z"/>
+                  </g>
+                </svg>
               </button>
             </div>
           </div>
@@ -335,6 +399,14 @@ fill="#606163" stroke="none">
           {renderComponent()}
         </div>
       </div>
+
+      {/* Replace the old notification dropdown with the new popup */}
+      <NotificationPopup 
+        notifications={notifications}
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        markAsRead={markAsRead}
+      />
     </div>
   );
 };
