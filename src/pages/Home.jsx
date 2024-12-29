@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Member1 from "../components/Panhathun";
 import Attendance from "../components/Elliot";
 import EditProject from "../components/EditProject";
@@ -6,12 +6,16 @@ import EditPerson from "../components/EditPerson";
 import "../styles/home.css"
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import NotificationPopup from '../components/NotificationPopup';
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -28,11 +32,41 @@ const Home = () => {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/notifications/');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      const data = await response.json();
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.is_read).length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  const markAsRead = async (notificationId) => {
+    try {
+      await fetch(`http://localhost:8000/api/notifications/${notificationId}/read/`, {
+        method: 'POST'
+      });
+      fetchNotifications(); // Refresh notifications
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navigation Bar */}
       <nav className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto pl-5 pr-5">
           <div className="flex justify-between h-20">
             <div className="flex items-center">
               <span className="text-xl  font-semibold text-gray-800">HR Dashboard</span>
@@ -132,6 +166,36 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
                   />
                 </svg>
                 Logout
+              </button>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative"
+              >
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+                <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512.000000 512.000000"
+                  preserveAspectRatio="xMidYMid meet">
+
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                  fill="#000000" stroke="none">
+                  <path d="M2480 5104 c-19 -8 -48 -27 -63 -42 -55 -52 -62 -75 -67 -236 l-5
+                  -149 -92 -18 c-176 -36 -367 -117 -533 -227 -117 -78 -318 -280 -399 -401
+                  -106 -160 -182 -338 -224 -526 -17 -80 -20 -143 -27 -570 -8 -530 -13 -585
+                  -75 -771 -76 -230 -190 -409 -378 -597 -164 -162 -182 -197 -182 -342 0 -89 3
+                  -106 27 -156 53 -107 158 -186 277 -209 77 -14 3567 -14 3647 1 114 21 219
+                  101 272 208 24 50 27 67 27 156 0 144 -20 182 -173 333 -130 128 -188 201
+                  -258 319 -88 147 -147 308 -179 483 -15 77 -19 184 -25 575 -6 428 -9 490 -27
+                  570 -67 298 -194 527 -412 746 -216 215 -463 351 -744 408 l-92 18 -5 149 c-5
+                  161 -12 184 -67 236 -58 56 -151 73 -223 42z"/>
+                  <path d="M1780 625 c0 -33 62 -182 104 -249 172 -274 506 -422 818 -362 219
+                  42 402 164 526 351 44 66 111 220 112 258 0 16 -44 17 -780 17 -680 0 -780 -2
+                  -780 -15z"/>
+                  </g>
+                </svg>
               </button>
             </div>
           </div>
@@ -300,34 +364,29 @@ l-43 -23 -644 0 c-704 0 -685 -2 -736 59 -68 81 -48 194 43 242 33 18 71 19
                   onClick={() => setActiveComponent('edit-person')}
                   className={`flex items-center text-gray-700 w-full ${activeComponent === 'edit-person' ? 'font-bold' : ''}`}
                 >
-                    <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
+                  <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
  viewBox="0 0 512.000000 512.000000"
  preserveAspectRatio="xMidYMid meet">
 
 <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
 fill="#606163" stroke="none">
-<path d="M2055 5105 c-464 -64 -756 -344 -841 -808 -25 -135 -23 -383 5 -557
-95 -593 308 -964 646 -1126 141 -68 194 -79 385 -79 175 0 227 9 352 59 193
-78 375 261 493 495 121 243 202 587 212 906 11 366 -76 630 -276 838 -214 223
--585 326 -976 272z"/>
-<path d="M1310 2595 c-52 -23 -162 -66 -245 -94 -82 -29 -188 -71 -235 -93
--161 -77 -271 -221 -348 -453 -111 -337 -216 -1168 -160 -1270 24 -44 56 -71
-118 -98 272 -120 856 -252 1385 -314 245 -28 776 -21 957 13 l27 5 -25 41
-c-44 69 -100 189 -128 271 -84 252 -79 555 14 808 173 475 639 809 1128 809
-50 0 92 4 92 9 0 15 -91 104 -143 140 -58 40 -147 77 -336 142 -80 28 -184 68
--233 91 l-88 41 -69 -66 c-222 -209 -490 -306 -816 -294 -284 10 -516 105
--727 296 -36 34 -68 61 -70 60 -1 -1 -46 -20 -98 -44z"/>
-<path d="M3716 1969 c-409 -47 -741 -338 -843 -739 -122 -480 129 -970 595
--1160 435 -177 951 -4 1201 401 101 164 144 319 144 519 0 150 -19 247 -73
-378 -52 124 -117 220 -214 317 -164 164 -368 261 -596 285 -112 11 -114 11
--214 -1z m171 -390 c38 -14 83 -57 99 -96 10 -23 14 -77 14 -178 l0 -145 138
-0 c165 0 199 -8 245 -60 77 -84 54 -210 -45 -259 -39 -18 -62 -21 -191 -21
-l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
-85 -71 254 l0 147 -150 0 c-130 0 -156 3 -190 20 -83 42 -115 148 -69 230 42
-74 71 85 252 88 l157 4 0 147 c0 135 2 152 23 191 38 73 129 108 204 79z"/>
+<path d="M2025 4789 c-221 -43 -405 -163 -525 -340 -97 -141 -134 -268 -134
+-449 -1 -225 75 -410 229 -565 154 -154 340 -230 565 -230 225 0 411 76 565
+230 154 154 230 340 230 565 0 174 -36 297 -125 433 -112 173 -271 287 -480
+344 -68 18 -258 25 -325 12z"/>
+<path d="M1948 3025 c-412 -59 -773 -273 -1038 -616 -238 -308 -378 -689 -420
+-1144 -17 -190 -27 -168 103 -230 426 -201 940 -347 1347 -384 172 -16 505
+-10 524 10 3 2 23 83 46 179 l40 175 533 533 532 533 -39 72 c-244 456 -640
+760 -1116 857 -136 28 -375 35 -512 15z"/>
+<path d="M4251 2420 c-23 -5 -62 -20 -85 -34 -85 -50 -94 -33 156 -283 l226
+-226 31 43 c92 128 75 308 -40 415 -27 26 -69 55 -92 65 -52 23 -138 31 -196
+20z"/>
+<path d="M3355 1600 l-620 -620 228 -227 227 -228 620 620 620 620 -228 228
+-227 227 -620 -620z"/>
+<path d="M2666 800 c-11 -30 -104 -445 -101 -448 4 -4 448 98 455 104 2 3 -75
+84 -172 181 -120 120 -179 172 -182 163z"/>
 </g>
-                    </svg>
-
+                  </svg>
                   <span className="font-medium pl-2 text-gray-600">Edit Persons</span>
                 </button>
               </li>
@@ -340,6 +399,14 @@ l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
           {renderComponent()}
         </div>
       </div>
+
+      {/* Replace the old notification dropdown with the new popup */}
+      <NotificationPopup 
+        notifications={notifications}
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        markAsRead={markAsRead}
+      />
     </div>
   );
 };
