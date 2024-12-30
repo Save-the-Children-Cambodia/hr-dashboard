@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import NotificationPopup from '../components/NotificationPopup';
 import CustomChatbot from '../components/CustomChatbot';
+import SCI_Image from "../assets/sci_logo.png"
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
@@ -70,7 +71,7 @@ const Home = () => {
         <div className="mx-auto pl-5 pr-5">
           <div className="flex justify-between h-20">
             <div className="flex items-center">
-              <span className="text-xl  font-semibold text-gray-800">HR Dashboard</span>
+              <img className="h-10 w-10" src={SCI_Image} alt="sci_logo" />
             </div>
             <div className="flex items-center space-x-4">
               <button 
@@ -214,7 +215,7 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
               <li className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
                 <button 
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center  text-gray-700 w-full"
+                  className="flex items-center px-1 text-gray-700 w-full"
                 >
                     <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 512.000000 512.000000"
@@ -249,7 +250,7 @@ fill="#606163" stroke="none">
 -351 260 -579 299 -121 20 -663 20 -781 -1z"/>
 </g>
                     </svg>
-                  <span className="font-medium p-3 text-gray-600">Select Member</span>
+                  <span className="font-medium px-2 text-gray-600">Select Member</span>
                   <svg 
                     className={`w-5 h-5 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`}
                     fill="none" 

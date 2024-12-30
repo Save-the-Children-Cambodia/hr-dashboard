@@ -27,13 +27,6 @@ const EditPerson = () => {
     { id: 2, name: "USAID DCA" },
   ];
 
-  const roleOptions = [
-    "REALM Manager",
-    "Research",
-    "Evuation Specialist",
-    "MEAL Coordinator",
-  ];
-
   const handleEdit = (staff) => {
     setEditingPerson({
       id: staff.id,
@@ -263,18 +256,14 @@ const EditPerson = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Role</label>
-                <select 
+                <input 
+                  type="text"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   value={editingPerson.role}
                   onChange={(e) => setEditingPerson({...editingPerson, role: e.target.value})}
-                >
-                  <option value="">Select Role</option>
-                  {roleOptions.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Enter role"
+                  required
+                />
               </div>
 
               <div>
@@ -336,9 +325,10 @@ const EditPerson = () => {
             <h2 className="text-xl font-bold mb-4">Add New Staff</h2>
             <form onSubmit={handleAddStaff} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Staff Name</label>
+                <label className="block text-left text-sm font-medium text-gray-700">Staff Name</label>
                 <input
                   type="text"
+                  placeholder="Enter name"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   value={newStaff.staff_name}
                   onChange={(e) => setNewStaff({...newStaff, staff_name: e.target.value})}
@@ -347,24 +337,19 @@ const EditPerson = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Role</label>
-                <select 
+                <label className="block text-left text-sm font-medium text-gray-700">Role</label>
+                <input 
+                  type="text"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   value={newStaff.role}
                   onChange={(e) => setNewStaff({...newStaff, role: e.target.value})}
+                  placeholder="Enter role"
                   required
-                >
-                  <option value="">Select Role</option>
-                  {roleOptions.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                <label className="block text-left text-sm font-medium text-gray-700">Start Date</label>
                 <input 
                   type="date"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -375,7 +360,7 @@ const EditPerson = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">End Date</label>
+                <label className="block text-left text-sm font-medium text-gray-700">End Date</label>
                 <input 
                   type="date"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -386,7 +371,7 @@ const EditPerson = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Total LOE (%)</label>
+                <label className="block text-left text-sm font-medium text-gray-700">Total LOE (%)</label>
                 <input 
                   type="number"
                   min="0"
