@@ -7,7 +7,7 @@ import "../styles/home.css"
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import NotificationPopup from '../components/NotificationPopup';
-import CustomChatbot from '../components/CustomChatbot';
+import ChatbotSidebar from '../components/ChatbotSidebar';
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
@@ -409,7 +409,7 @@ fill="#606163" stroke="none">
         markAsRead={markAsRead}
       />
 
-      <CustomChatbot />
+      <ChatbotSidebar />
     </div>
   );
 };
