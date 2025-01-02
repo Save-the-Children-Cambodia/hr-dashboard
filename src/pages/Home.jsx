@@ -64,6 +64,45 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleFileUpload = async (file) => {
+    // Check if file is Excel or CSV
+    if (!file.name.match(/\.(xlsx|csv)$/)) {
+      alert('Please upload an Excel (.xlsx) or CSV (.csv) file');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/upload-file/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Show the specific error message from the backend
+        throw new Error(data.error || 'File upload failed');
+      }
+
+      // Success message
+      alert(data.message || 'File uploaded successfully');
+      
+      // Refresh the components if needed
+      if (typeof window.refreshStaffList === 'function') {
+        window.refreshStaffList();
+      }
+      if (typeof window.refreshProjectList === 'function') {
+        window.refreshProjectList();
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert(error.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navigation Bar */}
@@ -78,34 +117,35 @@ const Home = () => {
                 onClick={() => {
                   const fileInput = document.createElement('input');
                   fileInput.type = 'file';
-                  fileInput.accept = '.json,.csv';
-                  fileInput.onchange = (e) => {
+                  fileInput.accept = '.xlsx,.csv';
+                  fileInput.onchange = async (e) => {
                     const file = e.target.files[0];
-                    console.log('Importing file:', file);
+                    if (file) {
+                      await handleFileUpload(file);
+                    }
                   };
                   fileInput.click();
                 }}
                 className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md font-semibold text-sm bg-custom-purple-500 shadow-sm hover:bg-custom-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
- viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#FFFFFF" stroke="none">
-<path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
-1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
--1385 10 -1220 0 -1337 -2 -1397 -17z"/>
-<path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
-0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
--2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
--151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2113 -662
-c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
--110 -49 -24 -94 -26 -137 -4 -18 9 -121 104 -229 212 l-198 197 0 -795 c0
--770 -1 -796 -20 -827 -72 -119 -255 -92 -289 41 -8 31 -11 280 -11 813 l0
-768 -176 -183 c-97 -100 -195 -193 -218 -207 -130 -76 -278 37 -236 178 10 35
-66 97 348 381 217 217 351 345 377 357 52 25 113 20 163 -15z"/>
-</g>
+                  viewBox="0 0 512.000000 512.000000"
+                  preserveAspectRatio="xMidYMid meet">
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                    fill="#FFFFFF" stroke="none">
+                    <path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
+                      1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
+                      -1385 10 -1220 0 -1337 -2 -1397 -17z"/>
+                    <path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
+                      0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
+                      -2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
+                      -151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2113 -662
+                      c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
+                      -110 -49 -24 -94 -26 -137 -4 -18 9 -121 104 -229 212 l-198 197 0 -795 c0
+                      -770 -1 -796 -20 -827 -72 -119 -255 -92 -289 41 -8 31 -11 280 -11 813 l0
+                      768 -176 -183 c-97 -100 -195 -193 -218 -207 -130 -76 -278 37 -236 178 10 35
+                      66 97 348 381 217 217 351 345 377 357 52 25 113 20 163 -15z"/>
+                  </g>
                 </svg>
                 <span className="text-white pl-2">Import Team Data</span>
               </button>
@@ -125,25 +165,24 @@ c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
                 className="inline-flex items-center px-6 py-3 bg-gray-300 border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
- viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
-<path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
-1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
--1385 10 -1220 0 -1337 -2 -1397 -17z"/>
-<path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
-0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
--2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
--151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2089 -648
-c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
-197 191 105 105 202 197 217 205 15 8 49 14 75 14 90 0 153 -63 153 -153 0
--26 -6 -60 -14 -75 -18 -34 -692 -705 -725 -722 -33 -17 -101 -16 -136 3 -17
-8 -186 172 -377 364 -305 306 -347 353 -354 386 -21 117 90 220 201 187 32
--10 79 -51 237 -208 l198 -196 2 790 3 789 23 37 c25 40 91 78 136 78 16 0 48
--9 70 -20z"/>
-</g>
+                  viewBox="0 0 512.000000 512.000000"
+                  preserveAspectRatio="xMidYMid meet">
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                    fill="#000000" stroke="none">
+                    <path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
+                      1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
+                      -1385 10 -1220 0 -1337 -2 -1397 -17z"/>
+                    <path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
+                      0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
+                      -2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
+                      -151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2089 -648
+                      c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
+                      197 191 105 105 202 197 217 205 15 8 49 14 75 14 90 0 153 -63 153 -153 0
+                      -26 -6 -60 -14 -75 -18 -34 -692 -705 -725 -722 -33 -17 -101 -16 -136 3 -17
+                      8 -186 172 -377 364 -305 306 -347 353 -354 386 -21 117 90 220 201 187 32
+                      -10 79 -51 237 -208 l198 -196 2 790 3 789 23 37 c25 40 91 78 136 78 16 0 48
+                      -9 70 -20z"/>
+                  </g>
                 </svg>
                 <span className="text-black pl-2">Export Team Data</span>
               </button>
