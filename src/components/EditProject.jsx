@@ -118,23 +118,29 @@ const EditProject = () => {
                     ))}
                   </select>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{project.award_name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{project.status}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{new Date(project.project_start_date).toLocaleDateString()}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{new Date(project.project_end_date).toLocaleDateString()}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{project.loe_percentage}%</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
+                <td className="px-6 py-4 text-left whitespace-nowrap">{project.award_name}</td>
+                <td className="px-6 py-4 text-left whitespace-nowrap">{project.status}</td>
+                <td className="px-6 py-4 text-left whitespace-nowrap">{new Date(project.project_start_date).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-left whitespace-nowrap">{new Date(project.project_end_date).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-left whitespace-nowrap">{project.loe_percentage}%</td>
+                <td className="px-6 py-4 whitespace-nowrap flex gap-2">
+                  <button 
                     onClick={() => handleEdit(project)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    className="bg-indigo-100 hover:bg-indigo-200 inline-flex items-center justify-center w-8 h-8 rounded-full"
+                    title="Edit Staff"
                   >
-                    Edit
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M3.1286 7.26743L6.72982 2.61036C6.92554 2.35922 6.99513 2.06887 6.92989 1.77323C6.87335 1.50447 6.70808 1.24893 6.46016 1.05507L5.85561 0.574821C5.32934 0.156257 4.67695 0.200317 4.30291 0.680563L3.89842 1.20531C3.84623 1.27096 3.85928 1.36789 3.92452 1.42076C3.92452 1.42076 4.94661 2.24026 4.96835 2.25789C5.03794 2.32398 5.09013 2.41209 5.10318 2.51784C5.12493 2.72492 4.9814 2.91878 4.76828 2.94521C4.66825 2.95843 4.57257 2.92759 4.50298 2.87031L3.4287 2.01556C3.37651 1.97635 3.29822 1.98472 3.25473 2.03759L0.701682 5.34204C0.536408 5.54912 0.479867 5.81788 0.536408 6.07783L0.862606 7.49213C0.880003 7.56703 0.945243 7.6199 1.02353 7.6199L2.4588 7.60228C2.71976 7.59788 2.96332 7.47892 3.1286 7.26743ZM5.1383 6.82692H7.47866C7.707 6.82692 7.89271 7.01505 7.89271 7.24636C7.89271 7.47811 7.707 7.6658 7.47866 7.6658H5.1383C4.90996 7.6658 4.72424 7.47811 4.72424 7.24636C4.72424 7.01505 4.90996 6.82692 5.1383 6.82692Z" fill="#5D5FEF"/>
+                    </svg>
                   </button>
-                  <button
-                    onClick={() => handleDelete(project.id)}
-                    className="text-red-600 hover:text-red-900"
+                  <button 
+                    onClick={() => handleDelete(project)}
+                    className="bg-red-100 hover:bg-red-200 inline-flex items-center justify-center w-8 h-8 rounded-full"
+                    title="Delete Staff"
                   >
-                    Delete
+                    <svg width="9" height="10" viewBox="0 0 9 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M8.38402 1.89467C8.56738 1.89467 8.72003 2.04692 8.72003 2.24064V2.41974C8.72003 2.60875 8.56738 2.76571 8.38402 2.76571H0.57231C0.388489 2.76571 0.23584 2.60875 0.23584 2.41974V2.24064C0.23584 2.04692 0.388489 1.89467 0.57231 1.89467H1.94661C2.22578 1.89467 2.46874 1.69624 2.53154 1.41626L2.60351 1.09481C2.71536 0.656936 3.08346 0.366119 3.50474 0.366119H5.45113C5.86783 0.366119 6.24005 0.656936 6.34778 1.07171L6.42479 1.41579C6.48713 1.69624 6.73009 1.89467 7.00972 1.89467H8.38402ZM7.68584 8.44223C7.82932 7.10504 8.08053 3.92821 8.08053 3.89616C8.0897 3.79906 8.05807 3.70715 7.99527 3.63315C7.92788 3.56386 7.84262 3.52286 7.74864 3.52286H1.21085C1.11641 3.52286 1.02657 3.56386 0.964223 3.63315C0.900963 3.70715 0.869792 3.79906 0.874376 3.89616C0.875218 3.90205 0.884232 4.01395 0.899302 4.20103C0.966247 5.03213 1.1527 7.34689 1.27319 8.44223C1.35845 9.24916 1.88791 9.75632 2.65483 9.7747C3.24663 9.78837 3.85631 9.79308 4.47974 9.79308C5.06696 9.79308 5.66335 9.78837 6.27349 9.7747C7.06699 9.76103 7.59599 9.26283 7.68584 8.44223Z" fill="#FF0000"/>
+                    </svg>
                   </button>
                 </td>
               </tr>
