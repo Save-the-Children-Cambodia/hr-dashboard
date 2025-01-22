@@ -111,3 +111,22 @@
 .react-chatbot-kit-user-avatar-container {
   display: none !important;
 }
+
+.react-chatbot-kit-chat-message-container {
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.sources-message {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 8px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.loading-message {
+  font-style: italic;
+  color: #888;
+}
