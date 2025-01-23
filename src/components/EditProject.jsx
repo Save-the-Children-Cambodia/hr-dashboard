@@ -8,7 +8,6 @@ const EditProject = () => {
     status: '',
     project_start_date: '',
     project_end_date: '',
-    loe_percentage: '',
     staff: []
   });
 
@@ -19,7 +18,6 @@ const EditProject = () => {
       status: project.status || '',
       project_start_date: project.project_start_date ? project.project_start_date.split('T')[0] : '',
       project_end_date: project.project_end_date ? project.project_end_date.split('T')[0] : '',
-      loe_percentage: project.loe_percentage || '',
       staff: project.staff || []
     });
     setIsEditModalOpen(true);
@@ -100,15 +98,14 @@ const EditProject = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status of Award</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">LOE %</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {projects.map((project) => (
               <tr key={project.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">{project.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 text-left whitespace-nowrap">{project.id}</td>
+                <td className="px-6 py-4 text-left whitespace-nowrap">
                   {/* Add an endpoint to fetch staff for this project */}
                   <select className="py-2 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 border-none">
                     {project.staff && project.staff.map((staff) => (
@@ -122,7 +119,6 @@ const EditProject = () => {
                 <td className="px-6 py-4 text-left whitespace-nowrap">{project.status}</td>
                 <td className="px-6 py-4 text-left whitespace-nowrap">{new Date(project.project_start_date).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-left whitespace-nowrap">{new Date(project.project_end_date).toLocaleDateString()}</td>
-                <td className="px-6 py-4 text-left whitespace-nowrap">{project.loe_percentage}%</td>
                 <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                   <button 
                     onClick={() => handleEdit(project)}
@@ -201,20 +197,6 @@ const EditProject = () => {
                   required
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">LOE Percentage</label>
-                <input 
-                  type="number"
-                  min="0"
-                  max="100"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  value={editingProject.loe_percentage}
-                  onChange={(e) => setEditingProject({...editingProject, loe_percentage: e.target.value})}
-                  required
-                />
-              </div>
-
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
