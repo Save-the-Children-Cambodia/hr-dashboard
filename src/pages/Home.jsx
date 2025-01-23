@@ -1,32 +1,23 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-=======
 import React, { useState, useEffect } from "react";
->>>>>>> refs/remotes/origin/main
 import Member1 from "../components/Panhathun";
 import Attendance from "../components/Elliot";
 import EditProject from "../components/EditProject";
 import EditPerson from "../components/EditPerson";
 import "../styles/home.css"
-<<<<<<< HEAD
-=======
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import NotificationPopup from '../components/NotificationPopup';
 import CustomChatbot from '../components/CustomChatbot';
->>>>>>> refs/remotes/origin/main
+import SCI_Image from "../assets/sci_logo.png"
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-<<<<<<< HEAD
-=======
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
->>>>>>> refs/remotes/origin/main
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -43,8 +34,6 @@ const Home = () => {
     }
   };
 
-<<<<<<< HEAD
-=======
   const fetchNotifications = async () => {
     try {
       const response = await fetch('http://localhost:8000/api/notifications/');
@@ -75,57 +64,88 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
->>>>>>> refs/remotes/origin/main
+  const handleFileUpload = async (file) => {
+    // Check if file is Excel or CSV
+    if (!file.name.match(/\.(xlsx|csv)$/)) {
+      alert('Please upload an Excel (.xlsx) or CSV (.csv) file');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/upload-file/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Show the specific error message from the backend
+        throw new Error(data.error || 'File upload failed');
+      }
+
+      // Success message
+      alert(data.message || 'File uploaded successfully');
+      
+      // Refresh the components if needed
+      if (typeof window.refreshStaffList === 'function') {
+        window.refreshStaffList();
+      }
+      if (typeof window.refreshProjectList === 'function') {
+        window.refreshProjectList();
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert(error.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navigation Bar */}
       <nav className="bg-white shadow-lg">
-<<<<<<< HEAD
-        <div className="max-w-7xl mx-auto">
-=======
         <div className="mx-auto pl-5 pr-5">
->>>>>>> refs/remotes/origin/main
           <div className="flex justify-between h-20">
             <div className="flex items-center">
-              <span className="text-xl  font-semibold text-gray-800">HR Dashboard</span>
+              <img className="h-10 w-10" src={SCI_Image} alt="sci_logo" />
             </div>
             <div className="flex items-center space-x-4">
               <button 
                 onClick={() => {
                   const fileInput = document.createElement('input');
                   fileInput.type = 'file';
-                  fileInput.accept = '.json,.csv';
-                  fileInput.onchange = (e) => {
+                  fileInput.accept = '.xlsx,.csv';
+                  fileInput.onchange = async (e) => {
                     const file = e.target.files[0];
-                    console.log('Importing file:', file);
+                    if (file) {
+                      await handleFileUpload(file);
+                    }
                   };
                   fileInput.click();
                 }}
-<<<<<<< HEAD
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-sm bg-custom-purple-500 shadow-sm hover:bg-custom-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-=======
                 className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md font-semibold text-sm bg-custom-purple-500 shadow-sm hover:bg-custom-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
->>>>>>> refs/remotes/origin/main
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
- viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#FFFFFF" stroke="none">
-<path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
-1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
--1385 10 -1220 0 -1337 -2 -1397 -17z"/>
-<path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
-0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
--2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
--151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2113 -662
-c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
--110 -49 -24 -94 -26 -137 -4 -18 9 -121 104 -229 212 l-198 197 0 -795 c0
--770 -1 -796 -20 -827 -72 -119 -255 -92 -289 41 -8 31 -11 280 -11 813 l0
-768 -176 -183 c-97 -100 -195 -193 -218 -207 -130 -76 -278 37 -236 178 10 35
-66 97 348 381 217 217 351 345 377 357 52 25 113 20 163 -15z"/>
-</g>
+                  viewBox="0 0 512.000000 512.000000"
+                  preserveAspectRatio="xMidYMid meet">
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                    fill="#FFFFFF" stroke="none">
+                    <path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
+                      1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
+                      -1385 10 -1220 0 -1337 -2 -1397 -17z"/>
+                    <path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
+                      0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
+                      -2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
+                      -151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2113 -662
+                      c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
+                      -110 -49 -24 -94 -26 -137 -4 -18 9 -121 104 -229 212 l-198 197 0 -795 c0
+                      -770 -1 -796 -20 -827 -72 -119 -255 -92 -289 41 -8 31 -11 280 -11 813 l0
+                      768 -176 -183 c-97 -100 -195 -193 -218 -207 -130 -76 -278 37 -236 178 10 35
+                      66 97 348 381 217 217 351 345 377 357 52 25 113 20 163 -15z"/>
+                  </g>
                 </svg>
                 <span className="text-white pl-2">Import Team Data</span>
               </button>
@@ -142,46 +162,31 @@ c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
                   document.body.removeChild(link);
                   URL.revokeObjectURL(url);
                 }}
-<<<<<<< HEAD
-                className="inline-flex items-center px-4 py-2 bg-gray-300 border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-=======
                 className="inline-flex items-center px-6 py-3 bg-gray-300 border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
->>>>>>> refs/remotes/origin/main
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
- viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
-<path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
-1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
--1385 10 -1220 0 -1337 -2 -1397 -17z"/>
-<path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
-0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
--2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
--151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2089 -648
-c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
-197 191 105 105 202 197 217 205 15 8 49 14 75 14 90 0 153 -63 153 -153 0
--26 -6 -60 -14 -75 -18 -34 -692 -705 -725 -722 -33 -17 -101 -16 -136 3 -17
-8 -186 172 -377 364 -305 306 -347 353 -354 386 -21 117 90 220 201 187 32
--10 79 -51 237 -208 l198 -196 2 790 3 789 23 37 c25 40 91 78 136 78 16 0 48
--9 70 -20z"/>
-</g>
+                  viewBox="0 0 512.000000 512.000000"
+                  preserveAspectRatio="xMidYMid meet">
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                    fill="#000000" stroke="none">
+                    <path d="M1160 4622 c-125 -33 -235 -121 -298 -240 l-33 -62 1730 0 c1378 0
+                      1731 3 1731 13 0 26 -63 119 -115 170 -60 59 -152 109 -233 126 -37 8 -452 11
+                      -1385 10 -1220 0 -1337 -2 -1397 -17z"/>
+                    <path d="M545 3988 c-169 -32 -319 -174 -366 -346 -18 -63 -19 -132 -19 -1400
+                      0 -1462 -2 -1411 59 -1517 62 -107 145 -178 266 -226 l60 -24 1988 -3 c1757
+                      -2 1995 -1 2054 13 185 43 329 188 368 372 22 101 22 2655 0 2756 -35 165
+                      -151 298 -314 361 l-56 21 -1995 1 c-1238 1 -2014 -2 -2045 -8z m2089 -648
+                      c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
+                      197 191 105 105 202 197 217 205 15 8 49 14 75 14 90 0 153 -63 153 -153 0
+                      -26 -6 -60 -14 -75 -18 -34 -692 -705 -725 -722 -33 -17 -101 -16 -136 3 -17
+                      8 -186 172 -377 364 -305 306 -347 353 -354 386 -21 117 90 220 201 187 32
+                      -10 79 -51 237 -208 l198 -196 2 790 3 789 23 37 c25 40 91 78 136 78 16 0 48
+                      -9 70 -20z"/>
+                  </g>
                 </svg>
                 <span className="text-black pl-2">Export Team Data</span>
               </button>
               <button 
-<<<<<<< HEAD
-                onClick={() => setActiveComponent('settings')} 
-                className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Account
-=======
                 onClick={() => {
                   logout();
                   navigate('/login');
@@ -232,7 +237,6 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
                   -780 -15z"/>
                   </g>
                 </svg>
->>>>>>> refs/remotes/origin/main
               </button>
             </div>
           </div>
@@ -250,7 +254,7 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
               <li className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
                 <button 
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center  text-gray-700 w-full"
+                  className="flex items-center px-1 text-gray-700 w-full"
                 >
                     <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 512.000000 512.000000"
@@ -285,7 +289,7 @@ fill="#606163" stroke="none">
 -351 260 -579 299 -121 20 -663 20 -781 -1z"/>
 </g>
                     </svg>
-                  <span className="font-medium p-3 text-gray-600">Select Member</span>
+                  <span className="font-medium px-2 text-gray-600">Select Member</span>
                   <svg 
                     className={`w-5 h-5 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`}
                     fill="none" 
@@ -401,40 +405,12 @@ l-43 -23 -644 0 c-704 0 -685 -2 -736 59 -68 81 -48 194 43 242 33 18 71 19
                   onClick={() => setActiveComponent('edit-person')}
                   className={`flex items-center text-gray-700 w-full ${activeComponent === 'edit-person' ? 'font-bold' : ''}`}
                 >
-<<<<<<< HEAD
-                    <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
-=======
                   <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
->>>>>>> refs/remotes/origin/main
  viewBox="0 0 512.000000 512.000000"
  preserveAspectRatio="xMidYMid meet">
 
 <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
 fill="#606163" stroke="none">
-<<<<<<< HEAD
-<path d="M2055 5105 c-464 -64 -756 -344 -841 -808 -25 -135 -23 -383 5 -557
-95 -593 308 -964 646 -1126 141 -68 194 -79 385 -79 175 0 227 9 352 59 193
-78 375 261 493 495 121 243 202 587 212 906 11 366 -76 630 -276 838 -214 223
--585 326 -976 272z"/>
-<path d="M1310 2595 c-52 -23 -162 -66 -245 -94 -82 -29 -188 -71 -235 -93
--161 -77 -271 -221 -348 -453 -111 -337 -216 -1168 -160 -1270 24 -44 56 -71
-118 -98 272 -120 856 -252 1385 -314 245 -28 776 -21 957 13 l27 5 -25 41
-c-44 69 -100 189 -128 271 -84 252 -79 555 14 808 173 475 639 809 1128 809
-50 0 92 4 92 9 0 15 -91 104 -143 140 -58 40 -147 77 -336 142 -80 28 -184 68
--233 91 l-88 41 -69 -66 c-222 -209 -490 -306 -816 -294 -284 10 -516 105
--727 296 -36 34 -68 61 -70 60 -1 -1 -46 -20 -98 -44z"/>
-<path d="M3716 1969 c-409 -47 -741 -338 -843 -739 -122 -480 129 -970 595
--1160 435 -177 951 -4 1201 401 101 164 144 319 144 519 0 150 -19 247 -73
-378 -52 124 -117 220 -214 317 -164 164 -368 261 -596 285 -112 11 -114 11
--214 -1z m171 -390 c38 -14 83 -57 99 -96 10 -23 14 -77 14 -178 l0 -145 138
-0 c165 0 199 -8 245 -60 77 -84 54 -210 -45 -259 -39 -18 -62 -21 -191 -21
-l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
-85 -71 254 l0 147 -150 0 c-130 0 -156 3 -190 20 -83 42 -115 148 -69 230 42
-74 71 85 252 88 l157 4 0 147 c0 135 2 152 23 191 38 73 129 108 204 79z"/>
-</g>
-                    </svg>
-
-=======
 <path d="M2025 4789 c-221 -43 -405 -163 -525 -340 -97 -141 -134 -268 -134
 -449 -1 -225 75 -410 229 -565 154 -154 340 -230 565 -230 225 0 411 76 565
 230 154 154 230 340 230 565 0 174 -36 297 -125 433 -112 173 -271 287 -480
@@ -452,7 +428,6 @@ l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
 84 -172 181 -120 120 -179 172 -182 163z"/>
 </g>
                   </svg>
->>>>>>> refs/remotes/origin/main
                   <span className="font-medium pl-2 text-gray-600">Edit Persons</span>
                 </button>
               </li>
@@ -465,8 +440,6 @@ l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
           {renderComponent()}
         </div>
       </div>
-<<<<<<< HEAD
-=======
 
       {/* Replace the old notification dropdown with the new popup */}
       <NotificationPopup 
@@ -477,7 +450,6 @@ l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
       />
 
       <CustomChatbot />
->>>>>>> refs/remotes/origin/main
     </div>
   );
 };
