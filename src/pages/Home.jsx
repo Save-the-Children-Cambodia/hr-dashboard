@@ -1,13 +1,32 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
+=======
+import React, { useState, useEffect } from "react";
+>>>>>>> refs/remotes/origin/main
 import Member1 from "../components/Panhathun";
 import Attendance from "../components/Elliot";
 import EditProject from "../components/EditProject";
 import EditPerson from "../components/EditPerson";
 import "../styles/home.css"
+<<<<<<< HEAD
+=======
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import NotificationPopup from '../components/NotificationPopup';
+import CustomChatbot from '../components/CustomChatbot';
+>>>>>>> refs/remotes/origin/main
 
 const Home = () => {
   const [activeComponent, setActiveComponent] = useState('employees');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+<<<<<<< HEAD
+=======
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+>>>>>>> refs/remotes/origin/main
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -24,11 +43,48 @@ const Home = () => {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/notifications/');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      const data = await response.json();
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.is_read).length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  const markAsRead = async (notificationId) => {
+    try {
+      await fetch(`http://localhost:8000/api/notifications/${notificationId}/read/`, {
+        method: 'POST'
+      });
+      fetchNotifications(); // Refresh notifications
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+>>>>>>> refs/remotes/origin/main
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navigation Bar */}
       <nav className="bg-white shadow-lg">
+<<<<<<< HEAD
         <div className="max-w-7xl mx-auto">
+=======
+        <div className="mx-auto pl-5 pr-5">
+>>>>>>> refs/remotes/origin/main
           <div className="flex justify-between h-20">
             <div className="flex items-center">
               <span className="text-xl  font-semibold text-gray-800">HR Dashboard</span>
@@ -45,7 +101,11 @@ const Home = () => {
                   };
                   fileInput.click();
                 }}
+<<<<<<< HEAD
                 className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-sm bg-custom-purple-500 shadow-sm hover:bg-custom-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+=======
+                className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md font-semibold text-sm bg-custom-purple-500 shadow-sm hover:bg-custom-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+>>>>>>> refs/remotes/origin/main
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
  viewBox="0 0 512.000000 512.000000"
@@ -82,7 +142,11 @@ c21 -14 187 -175 369 -358 358 -360 353 -353 340 -448 -6 -50 -33 -85 -83
                   document.body.removeChild(link);
                   URL.revokeObjectURL(url);
                 }}
+<<<<<<< HEAD
                 className="inline-flex items-center px-4 py-2 bg-gray-300 border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+=======
+                className="inline-flex items-center px-6 py-3 bg-gray-300 border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+>>>>>>> refs/remotes/origin/main
               >
                 <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
  viewBox="0 0 512.000000 512.000000"
@@ -108,6 +172,7 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
                 <span className="text-black pl-2">Export Team Data</span>
               </button>
               <button 
+<<<<<<< HEAD
                 onClick={() => setActiveComponent('settings')} 
                 className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
@@ -116,6 +181,58 @@ c23 -11 50 -33 61 -48 20 -26 20 -45 23 -824 1 -439 6 -798 10 -798 4 0 93 86
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 Account
+=======
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }} 
+                className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-sm text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+              >
+                <svg 
+                  className="w-5 h-5 mr-2" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+                  />
+                </svg>
+                Logout
+              </button>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative"
+              >
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+                <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512.000000 512.000000"
+                  preserveAspectRatio="xMidYMid meet">
+
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                  fill="#000000" stroke="none">
+                  <path d="M2480 5104 c-19 -8 -48 -27 -63 -42 -55 -52 -62 -75 -67 -236 l-5
+                  -149 -92 -18 c-176 -36 -367 -117 -533 -227 -117 -78 -318 -280 -399 -401
+                  -106 -160 -182 -338 -224 -526 -17 -80 -20 -143 -27 -570 -8 -530 -13 -585
+                  -75 -771 -76 -230 -190 -409 -378 -597 -164 -162 -182 -197 -182 -342 0 -89 3
+                  -106 27 -156 53 -107 158 -186 277 -209 77 -14 3567 -14 3647 1 114 21 219
+                  101 272 208 24 50 27 67 27 156 0 144 -20 182 -173 333 -130 128 -188 201
+                  -258 319 -88 147 -147 308 -179 483 -15 77 -19 184 -25 575 -6 428 -9 490 -27
+                  570 -67 298 -194 527 -412 746 -216 215 -463 351 -744 408 l-92 18 -5 149 c-5
+                  161 -12 184 -67 236 -58 56 -151 73 -223 42z"/>
+                  <path d="M1780 625 c0 -33 62 -182 104 -249 172 -274 506 -422 818 -362 219
+                  42 402 164 526 351 44 66 111 220 112 258 0 16 -44 17 -780 17 -680 0 -780 -2
+                  -780 -15z"/>
+                  </g>
+                </svg>
+>>>>>>> refs/remotes/origin/main
               </button>
             </div>
           </div>
@@ -284,12 +401,17 @@ l-43 -23 -644 0 c-704 0 -685 -2 -736 59 -68 81 -48 194 43 242 33 18 71 19
                   onClick={() => setActiveComponent('edit-person')}
                   className={`flex items-center text-gray-700 w-full ${activeComponent === 'edit-person' ? 'font-bold' : ''}`}
                 >
+<<<<<<< HEAD
                     <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
+=======
+                  <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
+>>>>>>> refs/remotes/origin/main
  viewBox="0 0 512.000000 512.000000"
  preserveAspectRatio="xMidYMid meet">
 
 <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
 fill="#606163" stroke="none">
+<<<<<<< HEAD
 <path d="M2055 5105 c-464 -64 -756 -344 -841 -808 -25 -135 -23 -383 5 -557
 95 -593 308 -964 646 -1126 141 -68 194 -79 385 -79 175 0 227 9 352 59 193
 78 375 261 493 495 121 243 202 587 212 906 11 366 -76 630 -276 838 -214 223
@@ -312,6 +434,25 @@ l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
 </g>
                     </svg>
 
+=======
+<path d="M2025 4789 c-221 -43 -405 -163 -525 -340 -97 -141 -134 -268 -134
+-449 -1 -225 75 -410 229 -565 154 -154 340 -230 565 -230 225 0 411 76 565
+230 154 154 230 340 230 565 0 174 -36 297 -125 433 -112 173 -271 287 -480
+344 -68 18 -258 25 -325 12z"/>
+<path d="M1948 3025 c-412 -59 -773 -273 -1038 -616 -238 -308 -378 -689 -420
+-1144 -17 -190 -27 -168 103 -230 426 -201 940 -347 1347 -384 172 -16 505
+-10 524 10 3 2 23 83 46 179 l40 175 533 533 532 533 -39 72 c-244 456 -640
+760 -1116 857 -136 28 -375 35 -512 15z"/>
+<path d="M4251 2420 c-23 -5 -62 -20 -85 -34 -85 -50 -94 -33 156 -283 l226
+-226 31 43 c92 128 75 308 -40 415 -27 26 -69 55 -92 65 -52 23 -138 31 -196
+20z"/>
+<path d="M3355 1600 l-620 -620 228 -227 227 -228 620 620 620 620 -228 228
+-227 227 -620 -620z"/>
+<path d="M2666 800 c-11 -30 -104 -445 -101 -448 4 -4 448 98 455 104 2 3 -75
+84 -172 181 -120 120 -179 172 -182 163z"/>
+</g>
+                  </svg>
+>>>>>>> refs/remotes/origin/main
                   <span className="font-medium pl-2 text-gray-600">Edit Persons</span>
                 </button>
               </li>
@@ -324,6 +465,19 @@ l-147 0 0 -147 c0 -166 -14 -213 -73 -255 -47 -33 -148 -33 -196 1 -58 42 -71
           {renderComponent()}
         </div>
       </div>
+<<<<<<< HEAD
+=======
+
+      {/* Replace the old notification dropdown with the new popup */}
+      <NotificationPopup 
+        notifications={notifications}
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        markAsRead={markAsRead}
+      />
+
+      <CustomChatbot />
+>>>>>>> refs/remotes/origin/main
     </div>
   );
 };

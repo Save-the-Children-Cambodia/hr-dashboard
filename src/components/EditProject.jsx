@@ -22,7 +22,10 @@ const EditProject = () => {
   return (
     <div className="bg-white shadow-lg rounded-3xl p-8">
       <h1 className="text-left text-2xl font-bold text-gray-900 mb-5">Edit Project</h1>
+<<<<<<< HEAD
       
+=======
+>>>>>>> refs/remotes/origin/main
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -38,9 +41,15 @@ const EditProject = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             <tr>
+<<<<<<< HEAD
               <td className="px-6 py-4 whitespace-nowrap">1</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <select className="block w-full py-2 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 border-none">
+=======
+              <td className="text-left px-6 py-4 whitespace-nowrap">1</td>
+              <td className="text-left px-6 py-4 whitespace-nowrap">
+                <select className="py-2 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 border-none">
+>>>>>>> refs/remotes/origin/main
                   <option value="">Select Staff</option>
                   {staffOptions.map((staff) => (
                     <option key={staff.id} value={staff.id}>
@@ -49,11 +58,19 @@ const EditProject = () => {
                   ))}
                 </select>
               </td>
+<<<<<<< HEAD
               <td className="px-6 py-4 whitespace-nowrap">Project Name</td>
               <td className="px-6 py-4 whitespace-nowrap">Active</td>
               <td className="px-6 py-4 whitespace-nowrap">2024-03-20</td>
               <td className="px-6 py-4 whitespace-nowrap">2024-12-31</td>
               <td className="px-6 py-4 whitespace-nowrap gap-2 flex">
+=======
+              <td className="text-left px-6 py-4 whitespace-nowrap">Project Name</td>
+              <td className="text-left px-6 py-4 whitespace-nowrap">Active</td>
+              <td className="text-left px-6 py-4 whitespace-nowrap">2024-03-20</td>
+              <td className="text-left px-6 py-4 whitespace-nowrap">2024-12-31</td>
+              <td className="text-left px-6 py-4 whitespace-nowrap gap-2 flex">
+>>>>>>> refs/remotes/origin/main
                 <button 
                   onClick={() => handleEdit({
                     staffName: "FCF USAID",
