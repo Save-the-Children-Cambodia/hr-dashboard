@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import Select from 'react-select';
+import RunAssignment from '../components/RunAssignment';
 
 const AssignTasks = () => {
   const [loading, setLoading] = useState(false);
@@ -14,11 +15,6 @@ const AssignTasks = () => {
     status: 'unassigned',
     project: '',
     dependencies: [],
-  });
-  const [algorithmParams, setAlgorithmParams] = useState({
-    deadlineWeight: 1,
-    complexityWeight: 1,
-    skillMatchWeight: 1,
   });
   const [filters, setFilters] = useState({
     sortBy: 'deadline', // 'deadline', 'effort', 'project'
@@ -279,82 +275,15 @@ const AssignTasks = () => {
     }
   };
 
-  const triggerAssignment = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-        
-        // Debug logs for token
-        console.log('Token found:', !!token);
-        console.log('Token value:', token);
-        
-        // Decode JWT token to check its contents (for debugging)
-        const tokenParts = token.split('.');
-        const payload = JSON.parse(atob(tokenParts[1]));
-        console.log('Token payload:', payload);
-        console.log('Token expiration:', new Date(payload.exp * 1000));
-        console.log('Current time:', new Date());
-        
-        const requestData = {
-            deadlineWeight: Number(algorithmParams.deadlineWeight),
-            complexityWeight: Number(algorithmParams.complexityWeight),
-            skillMatchWeight: Number(algorithmParams.skillMatchWeight)
-        };
-        
-        console.log('Request data:', requestData);
-        console.log('Request headers:', {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        });
-        
-        const response = await fetch('http://localhost:8000/api/assign-staff/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-        console.log('Response status:', response.status);
-        
-        const responseData = await response.text();
-        console.log('Raw response data:', responseData);
-        
-        try {
-            const jsonData = JSON.parse(responseData);
-            console.log('Parsed response data:', jsonData);
-        } catch (e) {
-            console.log('Could not parse response as JSON:', e);
-        }
-
-        if (!response.ok) {
-            const errorData = responseData ? JSON.parse(responseData) : {};
-            throw new Error(errorData.detail || errorData.code || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = JSON.parse(responseData);
-        if (data.assignments) {
-            setAssignments(data.assignments);
-            toast.success('Staff assignments completed successfully');
-            await Promise.all([
-                fetchStaffList(),
-                fetchProjects(),
-                fetchProjectStaffList(),
-                fetchTasks(),
-                fetchTaskStats()
-            ]);
-        } else {
-            throw new Error('No assignments returned from server');
-        }
-    } catch (error) {
-        console.error('Assignment error:', error);
-        console.error('Error stack:', error.stack);
-        toast.error('Failed to assign staff: ' + error.message);
-    }
+  const handleAssignmentComplete = async (newAssignments) => {
+    setAssignments(newAssignments);
+    await Promise.all([
+      fetchStaffList(),
+      fetchProjects(),
+      fetchProjectStaffList(),
+      fetchTasks(),
+      fetchTaskStats()
+    ]);
   };
 
   // Update the LOE Distribution Chart section with null check
@@ -703,30 +632,6 @@ const AssignTasks = () => {
     return diffDays;
   };
 
-  const debugToken = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        console.log('Debugging token:', token);
-        
-        const response = await fetch('http://localhost:8000/api/debug-token/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                username: 'thun2'  // The username from your token
-            })
-        });
-        
-        const data = await response.json();
-        console.log('Debug response:', data);
-        
-    } catch (error) {
-        console.error('Debug error:', error);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -777,44 +682,10 @@ const AssignTasks = () => {
           <h1 className="text-2xl font-bold text-gray-900">Staff Assignment</h1>
         </div>
         <div className="space-x-4">
-          <button
-            onClick={triggerAssignment}
-            disabled={loading}
-            className={`px-4 py-2 rounded-lg text-white ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {loading ? 'Assigning...' : 'Run Assignment'}
-          </button>
-        </div>
-      </div>
-
-      {/* Algorithm Parameters Panel */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <h2 className="text-lg font-semibold mb-4">Algorithm Parameters</h2>
-        <div className="grid grid-cols-3 gap-4">
-          {Object.entries(algorithmParams).map(([param, value]) => (
-            <div key={param}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {param.charAt(0).toUpperCase() + param.slice(1).replace('Weight', ' Weight')}
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={value}
-                onChange={(e) =>
-                  setAlgorithmParams({
-                    ...algorithmParams,
-                    [param]: parseFloat(e.target.value),
-                  })
-                }
-                className="w-full"
-              />
-              <span className="text-sm text-gray-600">{value}</span>
-            </div>
-          ))}
+          <RunAssignment 
+            loading={loading} 
+            onAssignmentComplete={handleAssignmentComplete}
+          />
         </div>
       </div>
 
@@ -892,13 +763,6 @@ const AssignTasks = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       )}
-
-      <button
-        onClick={debugToken}
-        className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-      >
-        Debug Token
-      </button>
     </div>
   );
 };
