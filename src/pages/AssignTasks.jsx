@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import Select from 'react-select';
 
 const AssignTasks = () => {
   const [loading, setLoading] = useState(false);
@@ -39,6 +40,52 @@ const AssignTasks = () => {
     in_progress: 0,
     completed: 0
   });
+  const [skills, setSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+
+  // Add this constant for custom styles
+  const customStyles = {
+    control: (base) => ({
+      ...base,
+      minHeight: '42px',
+      border: '1px solid #D1D5DB',
+      borderRadius: '0.375rem',
+      boxShadow: 'none',
+      '&:hover': {
+        borderColor: '#9CA3AF'
+      }
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected 
+        ? '#4F46E5' 
+        : state.isFocused 
+          ? '#EEF2FF' 
+          : 'white',
+      color: state.isSelected ? 'white' : '#374151',
+      '&:hover': {
+        backgroundColor: state.isSelected ? '#4F46E5' : '#EEF2FF'
+      }
+    }),
+    multiValue: (base) => ({
+      ...base,
+      backgroundColor: '#EEF2FF',
+      borderRadius: '0.25rem'
+    }),
+    multiValueLabel: (base) => ({
+      ...base,
+      color: '#4F46E5',
+      fontWeight: 500
+    }),
+    multiValueRemove: (base) => ({
+      ...base,
+      color: '#4F46E5',
+      '&:hover': {
+        backgroundColor: '#E0E7FF',
+        color: '#4338CA'
+      }
+    })
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,7 +96,8 @@ const AssignTasks = () => {
           fetchProjects(),
           fetchProjectStaffList(),
           fetchTasks(),
-          fetchTaskStats()
+          fetchTaskStats(),
+          fetchSkills()
         ]);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -119,6 +167,19 @@ const AssignTasks = () => {
       setTaskStats(data);
     } catch (error) {
       console.error('Error fetching task stats:', error);
+    }
+  };
+
+  const fetchSkills = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/skills/');
+      if (!response.ok) {
+        throw new Error('Failed to fetch skills');
+      }
+      const data = await response.json();
+      setSkills(data);
+    } catch (error) {
+      console.error('Error fetching skills:', error);
     }
   };
 
@@ -356,7 +417,6 @@ const AssignTasks = () => {
       <h2 className="text-lg font-semibold mb-4">Staff Members</h2>
       <div className="space-y-4">
         {staffList?.map((staff) => {
-          // Update how we filter and calculate LOE
           const staffAssignments = projectStaffList.filter(ps => ps.staff.id === staff.id);
           const totalLOE = staffAssignments.reduce((sum, ps) => sum + (parseFloat(ps.loe_percentage) || 0), 0);
 
@@ -375,10 +435,13 @@ const AssignTasks = () => {
                       </span>
                     )}
                   </div>
-                  <div className="mt-1 flex space-x-2">
-                    {staff.skills?.map((skill, index) => (
-                      <span key={index} className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                        {skill}
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {staff.skills?.map((skill) => (
+                      <span 
+                        key={skill.id} 
+                        className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800"
+                      >
+                        {skill.name}
                       </span>
                     ))}
                   </div>
@@ -432,7 +495,7 @@ const AssignTasks = () => {
       {showAddTask && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Add New Task</h2>
-          <form onSubmit={handleAddTask} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Task Title
@@ -444,16 +507,35 @@ const AssignTasks = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
-            <div>
+            <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Required Skills (comma-separated)
+                Required Skills
               </label>
-              <input
-                type="text"
-                value={newTask.required_skills}
-                onChange={(e) => setNewTask({ ...newTask, required_skills: e.target.value })}
-                placeholder="e.g., Python, React, AWS"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              <Select
+                isMulti
+                options={skills.map(skill => ({
+                  value: skill.id,
+                  label: skill.name,
+                  category: skill.category
+                }))}
+                value={selectedSkills}
+                onChange={(selected) => {
+                  setSelectedSkills(selected);
+                  setNewTask({
+                    ...newTask,
+                    required_skills: selected ? selected.map(s => s.value) : []
+                  });
+                }}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                placeholder="Select required skills..."
+                formatOptionLabel={option => (
+                  <div className="flex justify-between">
+                    <span>{option.label}</span>
+                    <span className="text-gray-500 text-sm">{option.category}</span>
+                  </div>
+                )}
+                styles={customStyles}
               />
             </div>
             <div>
@@ -642,6 +724,48 @@ const AssignTasks = () => {
         
     } catch (error) {
         console.error('Debug error:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const taskData = {
+        ...newTask,
+        deadline: new Date(newTask.deadline).toISOString(), // Ensure proper date format
+        required_skills: selectedSkills.map(skill => skill.value)
+      };
+
+      const response = await fetch('http://localhost:8000/api/tasks/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(taskData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create task');
+      }
+      
+      // Handle successful creation
+      const data = await response.json();
+      console.log('Task created:', data);
+      
+      // Reset form
+      setNewTask({
+        title: '',
+        required_skills: [],
+        required_loe: 0,
+        deadline: new Date().toISOString().split('T')[0],
+        status: 'unassigned',
+        project: '',
+        dependencies: [],
+      });
+      setSelectedSkills([]);
+      
+    } catch (error) {
+      console.error('Error creating task:', error);
     }
   };
 
