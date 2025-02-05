@@ -239,7 +239,7 @@ const AssignTasks = () => {
       const taskData = {
         ...newTask,
         deadline: deadline.toISOString(),
-        project: newTask.project ? newTask.project.toString() : null  // Convert to string
+        project: newTask.project ? newTask.project.toString() : null
       };
 
       const response = await fetch('http://localhost:8000/api/tasks/', {
@@ -255,7 +255,7 @@ const AssignTasks = () => {
         throw new Error(errorData.error || 'Failed to create task');
       }
       
-      await Promise.all([fetchTasks(), fetchTaskStats()]);
+      // Reset form and close modal
       setNewTask({
         title: '',
         required_skills: '',
@@ -266,10 +266,46 @@ const AssignTasks = () => {
         dependencies: []
       });
       setShowAddTask(false);
-      toast.success('Task created successfully');
+      setSelectedSkills([]);
+
+      // Show success alert
+      alert('Task created successfully!');
+
+      // Refresh all data
+      await Promise.all([
+        fetchStaffList(),
+        fetchProjects(),
+        fetchProjectStaffList(),
+        fetchTasks(),
+        fetchTaskStats(),
+        fetchSkills()
+      ]);
+
+      toast.success('Task created successfully!', {
+        duration: 3000,
+        position: 'top-right',
+        style: {
+          background: '#4F46E5',
+          color: 'white',
+          padding: '16px',
+          borderRadius: '8px',
+        },
+        icon: '✅'
+      });
     } catch (error) {
       console.error('Error creating task:', error);
-      toast.error(error.message || 'Failed to create task');
+      alert('Failed to create task: ' + error.message);
+      toast.error(error.message || 'Failed to create task', {
+        duration: 4000,
+        position: 'top-right',
+        style: {
+          background: '#EF4444',
+          color: 'white',
+          padding: '16px',
+          borderRadius: '8px',
+        },
+        icon: '❌'
+      });
     }
   };
 
