@@ -22,11 +22,19 @@ const RunAssignment = ({ loading, onAssignmentComplete }) => {
       }
 
       const data = await response.json();
-      if (data.assignments) {
+      
+      // Handle the specific response format from the service
+      if (data.status === 'success') {
         onAssignmentComplete(data.assignments);
-        toast.success('Staff assignments completed successfully');
+        toast.success(data.message || 'Staff assignments completed successfully');
+      } else if (data.status === 'error') {
+        throw new Error(data.message || 'Assignment failed');
+      } else if (typeof data === 'string') {
+        // Handle case where service returns a string message
+        toast.error(data);
+        return;
       } else {
-        throw new Error('No assignments returned from server');
+        throw new Error('Unexpected response format from server');
       }
     } catch (error) {
       console.error('Error in assignment:', error);
@@ -35,15 +43,17 @@ const RunAssignment = ({ loading, onAssignmentComplete }) => {
   };
 
   return (
-    <button
-      onClick={triggerAssignment}
-      disabled={loading}
-      className={`px-4 py-2 rounded-lg text-white ${
-        loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-      }`}
-    >
-      {loading ? 'Assigning...' : 'Run Assignment'}
-    </button>
+    <div>
+      <button
+        onClick={triggerAssignment}
+        disabled={loading}
+        className={`px-4 py-2 rounded-lg text-white ${
+          loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        {loading ? 'Assigning...' : 'Run Assignment'}
+      </button>
+    </div>
   );
 };
 

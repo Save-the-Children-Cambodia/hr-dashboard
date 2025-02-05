@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import Select from 'react-select';
 import RunAssignment from '../components/RunAssignment';
+import StaffList from '../components/StaffList';
+import LOEDistributionChart from '../components/LOEDistributionChart';
+import TaskStats from '../components/TaskStats';
 
 const AssignTasks = () => {
   const [loading, setLoading] = useState(false);
@@ -145,7 +148,13 @@ const AssignTasks = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/tasks/');
+      const queryParams = new URLSearchParams({
+        sortBy: filters.sortBy,
+        availabilityThreshold: filters.availabilityThreshold,
+        skillFilter: filters.skillFilter
+      });
+      
+      const response = await fetch(`http://localhost:8000/api/tasks/?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
       setTasks(data);
@@ -154,6 +163,11 @@ const AssignTasks = () => {
       setError('Failed to fetch tasks');
     }
   };
+
+  // Update useEffect to re-fetch when filters change
+  useEffect(() => {
+    fetchTasks();
+  }, [filters]);
 
   const fetchTaskStats = async () => {
     try {
@@ -288,34 +302,10 @@ const AssignTasks = () => {
 
   // Update the LOE Distribution Chart section with null check
   const renderLOEDistributionChart = () => (
-    <div className="bg-white p-4 rounded-lg shadow-sm">
-      <h3 className="text-md font-medium mb-3">Team LOE Distribution</h3>
-      <div className="h-48 bg-gray-100 rounded flex items-end justify-around p-4">
-        <div 
-          className="w-8 bg-green-500" 
-          style={{ 
-            height: `${((workloadOverview?.distribution?.under_utilized || 0) / (staffList?.length || 1)) * 100}%` 
-          }}
-        />
-        <div 
-          className="w-8 bg-yellow-500" 
-          style={{ 
-            height: `${((workloadOverview?.distribution?.optimal || 0) / (staffList?.length || 1)) * 100}%` 
-          }}
-        />
-        <div 
-          className="w-8 bg-red-500" 
-          style={{ 
-            height: `${((workloadOverview?.distribution?.overloaded || 0) / (staffList?.length || 1)) * 100}%` 
-          }}
-        />
-      </div>
-      <div className="mt-2 text-sm text-gray-600 flex justify-between">
-        <span>Under Utilized ({workloadOverview?.distribution?.under_utilized || 0})</span>
-        <span>Optimal ({workloadOverview?.distribution?.optimal || 0})</span>
-        <span>Overloaded ({workloadOverview?.distribution?.overloaded || 0})</span>
-      </div>
-    </div>
+    <LOEDistributionChart 
+      workloadOverview={workloadOverview} 
+      staffList={staffList} 
+    />
   );
 
   // Update the Bottleneck Analysis section with null check
@@ -336,75 +326,6 @@ const AssignTasks = () => {
             <p className="mt-1 text-sm text-red-600">{bottleneck.suggestion}</p>
           </div>
         ))}
-      </div>
-    </div>
-  );
-
-  // Update the Staff List section with null check
-  const renderStaffList = () => (
-    <div className="col-span-8 bg-gray-50 rounded-lg p-4">
-      <h2 className="text-lg font-semibold mb-4">Staff Members</h2>
-      <div className="space-y-4">
-        {staffList?.map((staff) => {
-          const staffAssignments = projectStaffList.filter(ps => ps.staff.id === staff.id);
-          const totalLOE = staffAssignments.reduce((sum, ps) => sum + (parseFloat(ps.loe_percentage) || 0), 0);
-
-          return (
-            <div key={staff.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{staff.staff_name}</h3>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">
-                      Current LOE: {totalLOE}%
-                    </span>
-                    {totalLOE > 90 && (
-                      <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                        {totalLOE > 100 ? 'Overloaded' : 'Near Capacity'}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-2">
-                    {staff.skills?.map((skill) => (
-                      <span 
-                        key={skill.id} 
-                        className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800"
-                      >
-                        {skill.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="w-32">
-                  <div className="h-2 bg-gray-200 rounded-full">
-                    <div
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{
-                        width: `${totalLOE}%`,
-                        backgroundColor: 
-                          totalLOE > 100 ? '#EF4444' : 
-                          totalLOE > 90 ? '#F59E0B' : '#10B981'
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3">
-                <h4 className="text-sm font-medium">Assigned Projects</h4>
-                <div className="mt-2 space-y-2">
-                  {staffAssignments.map((assignment, index) => (
-                    <div key={index} className="bg-gray-50 p-2 rounded text-sm flex justify-between items-center">
-                      <span>{assignment.project.award_name} ({assignment.loe_percentage}% LOE)</span>
-                      <span className="text-xs text-gray-500">
-                        Due: {new Date(assignment.end_date).toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );
@@ -605,24 +526,7 @@ const AssignTasks = () => {
   );
 
   const renderTaskStats = () => (
-    <div className="grid grid-cols-4 gap-4 mb-6">
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-gray-500">Total Tasks</h3>
-        <p className="text-2xl font-bold">{taskStats.total}</p>
-      </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-gray-500">Unassigned</h3>
-        <p className="text-2xl font-bold text-yellow-600">{taskStats.unassigned}</p>
-      </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-gray-500">In Progress</h3>
-        <p className="text-2xl font-bold text-blue-600">{taskStats.in_progress}</p>
-      </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-gray-500">Completed</h3>
-        <p className="text-2xl font-bold text-green-600">{taskStats.completed}</p>
-      </div>
-    </div>
+    <TaskStats taskStats={taskStats} />
   );
 
   // Add helper function to calculate duration
@@ -673,6 +577,13 @@ const AssignTasks = () => {
       console.error('Error creating task:', error);
     }
   };
+
+  const renderStaffList = () => (
+    <StaffList 
+      staffList={staffList}
+      projectStaffList={projectStaffList}
+    />
+  );
 
   return (
     <div className="bg-white shadow-lg rounded-3xl p-8">
