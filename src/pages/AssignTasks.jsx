@@ -12,12 +12,11 @@ const AssignTasks = () => {
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({
     title: '',
-    required_skills: '',
+    required_skills: [],
     required_loe: 0,
     deadline: new Date().toISOString().split('T')[0],
     status: 'unassigned',
     project: '',
-    dependencies: [],
   });
   const [filters, setFilters] = useState({
     sortBy: 'deadline', // 'deadline', 'effort', 'project'
@@ -245,7 +244,7 @@ const AssignTasks = () => {
       const response = await fetch('http://localhost:8000/api/tasks/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', 
         },
         body: JSON.stringify(taskData)
       });
@@ -258,12 +257,11 @@ const AssignTasks = () => {
       // Reset form and close modal
       setNewTask({
         title: '',
-        required_skills: '',
+        required_skills: [],
         required_loe: 0,
         deadline: new Date().toISOString().split('T')[0],
         status: 'unassigned',
         project: '',
-        dependencies: []
       });
       setShowAddTask(false);
       setSelectedSkills([]);
@@ -489,29 +487,6 @@ const AssignTasks = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Dependencies
-              </label>
-              <select
-                multiple
-                value={newTask.dependencies}
-                onChange={(e) => setNewTask({
-                  ...newTask,
-                  dependencies: Array.from(e.target.selectedOptions, option => option.value)
-                })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              >
-                {tasks.map((task) => (
-                  <option key={task.id} value={task.id}>
-                    {task.title}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-1 text-sm text-gray-500">
-                Hold Ctrl/Cmd to select multiple tasks
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Complexity Level
               </label>
               <p className="text-sm text-gray-600">
@@ -555,6 +530,21 @@ const AssignTasks = () => {
               <p>Duration: {calculateDuration(new Date(), new Date(task.deadline))} days</p>
               <p>Deadline: {new Date(task.deadline).toLocaleDateString()}</p>
             </div>
+            
+            {/* Add Task Completion Section */}
+            {(task.status === 'assigned' || task.status === 'in_progress') && (
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <button
+                  onClick={() => handleTaskCompletion(task.id)}
+                  className="w-full px-3 py-2 text-sm bg-green-50 text-green-700 hover:bg-green-100 rounded-md flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Mark as Complete
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -575,44 +565,53 @@ const AssignTasks = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const taskData = {
-        ...newTask,
-        deadline: new Date(newTask.deadline).toISOString(), // Ensure proper date format
-        required_skills: selectedSkills.map(skill => skill.value)
-      };
+        // Format the task data with simple date format YYYY-MM-DD
+        const taskData = {
+            title: newTask.title,
+            required_skills: selectedSkills.map(skill => skill.value),
+            required_loe: parseInt(newTask.required_loe),
+            deadline: newTask.deadline, // Already in YYYY-MM-DD format from the date input
+            status: newTask.status,
+            project: newTask.project || null
+        };
+        
+        // Debug logs
+        console.log('Submitting task data:', taskData);
 
-      const response = await fetch('http://localhost:8000/api/tasks/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(taskData)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to create task');
-      }
-      
-      // Handle successful creation
-      const data = await response.json();
-      console.log('Task created:', data);
-      
-      // Reset form
-      setNewTask({
-        title: '',
-        required_skills: [],
-        required_loe: 0,
-        deadline: new Date().toISOString().split('T')[0],
-        status: 'unassigned',
-        project: '',
-        dependencies: [],
-      });
-      setSelectedSkills([]);
-      
+        const response = await fetch('http://localhost:8000/api/tasks/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(taskData)
+        });
+        
+        const responseData = await response.json();
+        console.log('Server response:', responseData);
+        
+        if (!response.ok) {
+            throw new Error(responseData.error || 'Failed to create task');
+        }
+        
+        // Reset form and show success message
+        setNewTask({
+            title: '',
+            required_skills: [],
+            required_loe: 0,
+            deadline: new Date().toISOString().split('T')[0], // Just the date part YYYY-MM-DD
+            status: 'unassigned',
+            project: '',
+        });
+        setSelectedSkills([]);
+        setShowAddTask(false);
+        toast.success('Task created successfully!');
+        await fetchTasks();
+        
     } catch (error) {
-      console.error('Error creating task:', error);
+        console.error('Error creating task:', error);
+        toast.error(error.message || 'Failed to create task');
     }
-  };
+};
 
   const renderStaffList = () => (
     <StaffList 
@@ -620,6 +619,36 @@ const AssignTasks = () => {
       projectStaffList={projectStaffList}
     />
   );
+
+  // Add new function to handle task completion
+  const handleTaskCompletion = async (taskId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/tasks/${taskId}/complete/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'completed',
+          completion_date: new Date().toISOString()
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update task status');
+      }
+
+      // Refresh the tasks list or update the local state
+      // You'll need to implement this based on your data fetching strategy
+      
+      // Show success message
+      toast.success('Task marked as complete successfully!');
+      
+    } catch (error) {
+      console.error('Error completing task:', error);
+      toast.error('Failed to mark task as complete');
+    }
+  };
 
   return (
     <div className="bg-white shadow-lg rounded-3xl p-8">
