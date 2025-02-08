@@ -32,12 +32,6 @@ const AssignTasks = () => {
   });
   const [error, setError] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [taskStats, setTaskStats] = useState({
-    total: 0,
-    unassigned: 0,
-    in_progress: 0,
-    completed: 0
-  });
   const [skills, setSkills] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
 
@@ -94,7 +88,6 @@ const AssignTasks = () => {
           fetchProjects(),
           fetchProjectStaffList(),
           fetchTasks(),
-          fetchTaskStats(),
           fetchSkills()
         ]);
       } catch (error) {
@@ -167,17 +160,6 @@ const AssignTasks = () => {
   useEffect(() => {
     fetchTasks();
   }, [filters]);
-
-  const fetchTaskStats = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/tasks/stats/');
-      if (!response.ok) throw new Error('Failed to fetch task stats');
-      const data = await response.json();
-      setTaskStats(data);
-    } catch (error) {
-      console.error('Error fetching task stats:', error);
-    }
-  };
 
   const fetchSkills = async () => {
     try {
@@ -275,7 +257,6 @@ const AssignTasks = () => {
         fetchProjects(),
         fetchProjectStaffList(),
         fetchTasks(),
-        fetchTaskStats(),
         fetchSkills()
       ]);
 
@@ -315,7 +296,7 @@ const AssignTasks = () => {
 
       if (!response.ok) throw new Error('Failed to delete task');
       
-      await Promise.all([fetchTasks(), fetchTaskStats()]);
+      await Promise.all([fetchTasks()]);
       toast.success('Task deleted successfully');
     } catch (error) {
       console.error('Error deleting task:', error);
@@ -329,8 +310,7 @@ const AssignTasks = () => {
       fetchStaffList(),
       fetchProjects(),
       fetchProjectStaffList(),
-      fetchTasks(),
-      fetchTaskStats()
+      fetchTasks()
     ]);
   };
 
@@ -552,7 +532,7 @@ const AssignTasks = () => {
   );
 
   const renderTaskStats = () => (
-    <TaskStats taskStats={taskStats} />
+    <TaskStats />
   );
 
   // Add helper function to calculate duration
@@ -638,11 +618,17 @@ const AssignTasks = () => {
         throw new Error('Failed to update task status');
       }
 
+      const data = await response.json();
+      
+      // Show success message with updated LOE if available
+      if (data.staff_total_loe !== null) {
+        toast.success(`Task completed! Staff's total LOE updated to: ${data.staff_total_loe}`);
+      } else {
+        toast.success('Task marked as complete successfully!');
+      }
+      
       // Refresh the tasks list or update the local state
       // You'll need to implement this based on your data fetching strategy
-      
-      // Show success message
-      toast.success('Task marked as complete successfully!');
       
     } catch (error) {
       console.error('Error completing task:', error);
