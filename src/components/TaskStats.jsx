@@ -13,7 +13,7 @@ const TaskStats = () => {
   useEffect(() => {
     const fetchTaskStats = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/tasks/get-stats/');
+        const response = await fetch('http://localhost:8000/api/tasks/stats/');
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to fetch task stats');
@@ -44,7 +44,7 @@ const TaskStats = () => {
           <p>{error}</p>
         </div>
       )}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-gray-500">Total Tasks</h3>
           <p className="text-2xl font-bold">{taskStats.total}</p>
@@ -56,10 +56,6 @@ const TaskStats = () => {
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-gray-500">Assigned</h3>
           <p className="text-2xl font-bold text-orange-600">{taskStats.assigned}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-gray-500">In Progress</h3>
-          <p className="text-2xl font-bold text-blue-600">{taskStats.in_progress}</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-gray-500">Completed</h3>

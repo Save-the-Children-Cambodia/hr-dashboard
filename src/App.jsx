@@ -4,7 +4,7 @@ import MainRoutes from './routes';
 import './App.css';
 
 function App() {
-  const basename = process.env.NODE_ENV === 'production' ? '/react-gh-pages' : '';
+  const basename = process.env.NODE_ENV === 'production' ? '/' : '';
 
   return (
     <BrowserRouter basename={basename}>
