@@ -13,7 +13,7 @@ const StaffList = ({ staffList, projectStaffList }) => {
             <div key={staff.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-medium">{staff.staff_name}</h3>
+                  <h3 className="font-medium text-start">{staff.staff_name}</h3>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-gray-600">
                       Current LOE: {totalLOE}%
