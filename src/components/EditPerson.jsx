@@ -257,15 +257,18 @@ const EditPerson = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Staff Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Assignments</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Staff LOE</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {staffList.map((staff) => (
               <tr key={staff.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-start">{staff.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-start">{staff.staff_name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-start">{staff.role}</td>
                 <td className="px-6 py-4">
@@ -277,7 +280,7 @@ const EditPerson = () => {
                           <div>
                             <span className="font-medium">{ps.project.award_name}</span>
                             <span className="ml-2 text-sm text-gray-500">
-                              ({ps.loe_percentage}%)
+                              ({staff.total_loe}%)
                             </span>
                           </div>
                           <button 
@@ -304,6 +307,7 @@ const EditPerson = () => {
                       </svg>
                   </button>
                 </td>
+                <td className="py-4 whitespace-nowrap text-center">{staff.total_loe}</td>
               </tr>
             ))}
           </tbody>

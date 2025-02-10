@@ -16,11 +16,11 @@ const StaffList = ({ staffList, projectStaffList }) => {
                   <h3 className="font-medium text-start">{staff.staff_name}</h3>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-gray-600">
-                      Current LOE: {totalLOE}%
+                      Current LOE: {staff.total_loe}%
                     </span>
-                    {totalLOE > 90 && (
+                    {staff.total_loe > 90 && (
                       <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                        {totalLOE > 100 ? 'Overloaded' : 'Near Capacity'}
+                        {staff.total_loe > 100 ? 'Overloaded' : 'Near Capacity'}
                       </span>
                     )}
                   </div>
@@ -40,10 +40,10 @@ const StaffList = ({ staffList, projectStaffList }) => {
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
-                        width: `${totalLOE}%`,
+                        width: `${staff.total_loe}%`,
                         backgroundColor: 
-                          totalLOE > 100 ? '#EF4444' : 
-                          totalLOE > 90 ? '#F59E0B' : '#10B981'
+                          staff.total_loe > 100 ? '#EF4444' : 
+                          staff.total_loe > 90 ? '#F59E0B' : '#10B981'
                       }}
                     ></div>
                   </div>
@@ -54,7 +54,7 @@ const StaffList = ({ staffList, projectStaffList }) => {
                 <div className="mt-2 space-y-2">
                   {staffAssignments.map((assignment, index) => (
                     <div key={index} className="bg-gray-50 p-2 rounded text-sm flex justify-between items-center">
-                      <span>{assignment.project.award_name} ({assignment.loe_percentage}% LOE)</span>
+                      <span>{assignment.project.award_name}</span>
                       <span className="text-xs text-gray-500">
                         Due: {new Date(assignment.end_date).toLocaleDateString()}
                       </span>
