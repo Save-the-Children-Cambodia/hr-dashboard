@@ -11,7 +11,7 @@ import CustomChatbot from '../components/CustomChatbot';
 import SCI_Image from "../assets/sci_logo.png"
 
 const Home = () => {
-  const [activeComponent, setActiveComponent] = useState('employees');
+  const [activeComponent, setActiveComponent] = useState('staff');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -20,21 +20,6 @@ const Home = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [selectedStaffId, setSelectedStaffId] = useState(null);
   const [staffList, setStaffList] = useState([]);
-
-  const renderComponent = () => {
-    switch (activeComponent) {
-      case 'employees':
-        return <Member1 />;
-      case 'attendance':
-        return <Attendance />;
-      case 'edit-project':
-        return <EditProject />;
-      case 'edit-person':
-        return <EditPerson />;
-      default:
-        return <Member1 />;
-    }
-  };
 
   const fetchNotifications = async () => {
     try {
@@ -72,6 +57,9 @@ const Home = () => {
         const response = await fetch('http://localhost:8000/api/staff/list/');
         const data = await response.json();
         setStaffList(data);
+        if (data.length > 0 && !selectedStaffId) {
+          setSelectedStaffId(data[0].id);
+        }
       } catch (error) {
         console.error('Error fetching staff list:', error);
       }
@@ -120,10 +108,21 @@ const Home = () => {
   };
 
   const renderContent = () => {
-    if (selectedStaffId) {
-      return <Member1 staffId={selectedStaffId} />;
+    switch (activeComponent) {
+      case 'staff':
+        return selectedStaffId ? <Member1 staffId={selectedStaffId} /> : <div>Loading staff data...</div>;
+      case 'edit-project':
+        return <EditProject />;
+      case 'edit-person':
+        return <EditPerson />;
+      default:
+        return selectedStaffId ? <Member1 staffId={selectedStaffId} /> : <div>Loading staff data...</div>;
     }
-    return <div className="p-4">Please select a staff member</div>;
+  };
+
+  const handleStaffSelect = (staffId) => {
+    setSelectedStaffId(staffId);
+    setActiveComponent('staff'); // Switch to staff view when selecting a staff member
   };
 
   return (
@@ -329,8 +328,8 @@ fill="#606163" stroke="none">
                 {staffList.map((staff) => (
                   <li key={staff.id} className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
                     <button 
-                      onClick={() => setSelectedStaffId(staff.id)}
-                      className={`flex items-center text-gray-700 w-full pl-4 ${selectedStaffId === staff.id ? 'font-bold' : ''}`}
+                      onClick={() => handleStaffSelect(staff.id)}
+                      className={`flex items-center text-gray-700 w-full pl-4 ${selectedStaffId === staff.id && activeComponent === 'staff' ? 'font-bold' : ''}`}
                     >
                       <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 512.000000 512.000000"
