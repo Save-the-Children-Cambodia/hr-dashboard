@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ChevronDownIcon from "../assets/chevron-down.svg"
-import ChevronUpIcon from "../assets/chevron-up.svg"
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -28,10 +26,6 @@ const EditPerson = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const projectOptions = [
-    { id: 1, name: "FCF USAID" },
-    { id: 2, name: "USAID DCA" },
-  ];
 
   const fetchStaffList = async () => {
     try {
@@ -279,9 +273,6 @@ const EditPerson = () => {
                         <div key={ps.id} className="flex items-center justify-between">
                           <div>
                             <span className="font-medium">{ps.project.award_name}</span>
-                            <span className="ml-2 text-sm text-gray-500">
-                              ({staff.total_loe}%)
-                            </span>
                           </div>
                           <button 
                             onClick={() => handleDeleteProjectAssignment(ps.id)}
@@ -307,7 +298,7 @@ const EditPerson = () => {
                       </svg>
                   </button>
                 </td>
-                <td className="py-4 whitespace-nowrap text-center">{staff.total_loe}</td>
+                <td className="py-4 whitespace-nowrap text-center">{staff.total_loe}%</td>
               </tr>
             ))}
           </tbody>

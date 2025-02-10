@@ -5,7 +5,7 @@ import EditProject from "../components/EditProject";
 import EditPerson from "../components/EditPerson";
 import "../styles/home.css"
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import NotificationPopup from '../components/NotificationPopup';
 import CustomChatbot from '../components/CustomChatbot';
 import SCI_Image from "../assets/sci_logo.png"
@@ -18,6 +18,8 @@ const Home = () => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [selectedStaffId, setSelectedStaffId] = useState(null);
+  const [staffList, setStaffList] = useState([]);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -64,6 +66,20 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const fetchStaffList = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/staff/list/');
+        const data = await response.json();
+        setStaffList(data);
+      } catch (error) {
+        console.error('Error fetching staff list:', error);
+      }
+    };
+
+    fetchStaffList();
+  }, []);
+
   const handleFileUpload = async (file) => {
     // Check if file is Excel or CSV
     if (!file.name.match(/\.(xlsx|csv)$/)) {
@@ -101,6 +117,13 @@ const Home = () => {
       console.error('Error uploading file:', error);
       alert(error.message);
     }
+  };
+
+  const renderContent = () => {
+    if (selectedStaffId) {
+      return <Member1 staffId={selectedStaffId} />;
+    }
+    return <div className="p-4">Please select a staff member</div>;
   };
 
   return (
@@ -303,58 +326,34 @@ fill="#606163" stroke="none">
 
               {/* Collapsible Menu Items */}
               <div className={`transition-all duration-300 ${isMenuOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-                <li className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-                  <button 
-                    onClick={() => setActiveComponent('employees')}
-                    className={`flex items-center text-gray-700 w-full pl-4 ${activeComponent === 'employees' ? 'font-bold' : ''}`}
-                  >
-                    <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
+                {staffList.map((staff) => (
+                  <li key={staff.id} className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+                    <button 
+                      onClick={() => setSelectedStaffId(staff.id)}
+                      className={`flex items-center text-gray-700 w-full pl-4 ${selectedStaffId === staff.id ? 'font-bold' : ''}`}
+                    >
+                      <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 512.000000 512.000000"
+                        preserveAspectRatio="xMidYMid meet">
 
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#606163" stroke="none">
-<path d="M2335 5105 c-273 -42 -517 -172 -708 -375 -210 -223 -319 -481 -334
--790 -21 -432 191 -845 557 -1084 180 -118 353 -178 563 -195 389 -30 721 92
-989 365 213 216 321 452 347 753 36 402 -116 776 -419 1038 -196 168 -376 252
--625 288 -120 17 -260 18 -370 0z"/>
-<path d="M1427 2639 c-452 -48 -766 -372 -912 -944 -97 -381 -122 -839 -60
--1090 51 -201 218 -405 411 -503 87 -44 212 -80 317 -92 62 -8 534 -10 1437
--8 l1345 3 85 24 c316 86 532 298 611 596 41 155 36 525 -12 817 -105 650
--371 1040 -792 1162 -96 28 -268 49 -319 39 -49 -9 -117 -45 -271 -144 -164
--106 -187 -118 -310 -164 -142 -53 -259 -76 -396 -76 -140 0 -248 20 -390 70
--134 48 -140 51 -350 184 -110 70 -192 115 -224 124 -56 14 -56 14 -170 2z"/>
-</g>
-                    </svg>
-                    <span className="font-medium pl-2 text-gray-600">Panhathun</span>
+                        <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                        fill="#606163" stroke="none">
+                        <path d="M2335 5105 c-273 -42 -517 -172 -708 -375 -210 -223 -319 -481 -334
+                        -790 -21 -432 191 -845 557 -1084 180 -118 353 -178 563 -195 389 -30 721 92
+                        989 365 213 216 321 452 347 753 36 402 -116 776 -419 1038 -196 168 -376 252
+                        -625 288 -120 17 -260 18 -370 0z"/>
+                        <path d="M1427 2639 c-452 -48 -766 -372 -912 -944 -97 -381 -122 -839 -60
+                        -1090 51 -201 218 -405 411 -503 87 -44 212 -80 317 -92 62 -8 534 -10 1437
+                        -8 l1345 3 85 24 c316 86 532 298 611 596 41 155 36 525 -12 817 -105 650
+                        -371 1040 -792 1162 -96 28 -268 49 -319 39 -49 -9 -117 -45 -271 -144 -164
+                        -106 -187 -118 -310 -164 -142 -53 -259 -76 -396 -76 -140 0 -248 20 -390 70
+                        -134 48 -140 51 -350 184 -110 70 -192 115 -224 124 -56 14 -56 14 -170 2z"/>
+                        </g>
+                      </svg>
+                      <span className="font-medium pl-2 text-gray-600">{staff.staff_name}</span>
                   </button>
                 </li>
-                <li className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-                  <button 
-                    onClick={() => setActiveComponent('attendance')}
-                    className={`flex items-center text-gray-700 w-full pl-4 ${activeComponent === 'attendance' ? 'font-bold' : ''}`}
-                  >
-                    <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#606163" stroke="none">
-<path d="M2335 5105 c-273 -42 -517 -172 -708 -375 -210 -223 -319 -481 -334
--790 -21 -432 191 -845 557 -1084 180 -118 353 -178 563 -195 389 -30 721 92
-989 365 213 216 321 452 347 753 36 402 -116 776 -419 1038 -196 168 -376 252
--625 288 -120 17 -260 18 -370 0z"/>
-<path d="M1427 2639 c-452 -48 -766 -372 -912 -944 -97 -381 -122 -839 -60
--1090 51 -201 218 -405 411 -503 87 -44 212 -80 317 -92 62 -8 534 -10 1437
--8 l1345 3 85 24 c316 86 532 298 611 596 41 155 36 525 -12 817 -105 650
--371 1040 -792 1162 -96 28 -268 49 -319 39 -49 -9 -117 -45 -271 -144 -164
--106 -187 -118 -310 -164 -142 -53 -259 -76 -396 -76 -140 0 -248 20 -390 70
--134 48 -140 51 -350 184 -110 70 -192 115 -224 124 -56 14 -56 14 -170 2z"/>
-</g>
-                    </svg>
-                    <span className="font-medium pl-2 text-gray-600">Elliot</span>
-                  </button>
-                </li>
+                ))}
               </div>
 
               {/* Data Options Section */}
@@ -366,36 +365,36 @@ fill="#606163" stroke="none">
                   className={`flex items-center text-gray-700 w-full ${activeComponent === 'edit-project' ? 'font-bold' : ''}`}
                 >
                     <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
- viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
+                      viewBox="0 0 512.000000 512.000000"
+                      preserveAspectRatio="xMidYMid meet">
 
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#606163" stroke="none">
-<path d="M3805 4786 c-37 -16 -70 -52 -84 -89 -6 -16 -11 -100 -11 -192 l0
--163 -178 -4 c-178 -3 -179 -3 -215 -31 -69 -52 -87 -134 -46 -207 40 -70 72
--80 268 -80 l171 0 0 -171 c0 -155 2 -175 21 -208 34 -59 64 -76 141 -76 60 0
-70 3 99 30 53 50 59 77 59 260 l0 165 174 0 c163 0 175 1 207 23 58 39 81 84
-77 145 -6 64 -29 99 -88 130 -41 20 -58 22 -206 22 l-163 0 -3 178 -3 179 -29
-37 c-46 61 -123 82 -191 52z"/>
-<path d="M1302 4639 c-135 -17 -268 -75 -383 -167 -117 -93 -197 -209 -252
--366 l-32 -91 -3 -1495 c-2 -1339 -1 -1503 13 -1575 64 -318 323 -566 642
--615 45 -7 454 -10 1238 -8 1309 4 1205 -2 1370 77 163 78 291 206 366 367 78
-166 73 54 76 1524 l3 1315 -25 -59 c-53 -129 -134 -214 -260 -273 -56 -26 -69
--28 -186 -28 -125 0 -125 0 -202 38 -151 75 -246 205 -272 373 l-6 41 -67 12
-c-181 33 -331 172 -377 346 -44 170 9 352 136 469 51 48 94 73 189 114 30 13
--1869 14 -1968 1z m350 -1254 c45 -34 71 -90 66 -145 -16 -162 -227 -201 -299
--54 -37 77 -15 150 62 202 28 20 44 23 89 20 35 -2 66 -11 82 -23z m1827 10
-c110 -56 117 -212 13 -277 l-37 -23 -643 -3 c-423 -2 -656 1 -681 8 -47 12
--96 65 -110 118 -18 64 12 136 72 172 31 19 55 20 695 20 563 0 667 -2 691
--15z m-1839 -776 c53 -30 84 -88 78 -149 -16 -163 -227 -199 -299 -52 -67 137
-86 277 221 201z m1839 6 c68 -35 104 -119 82 -188 -15 -43 -68 -95 -112 -107
--47 -14 -1272 -13 -1321 0 -44 13 -94 66 -107 118 -18 64 12 136 72 172 31 19
-55 20 695 20 563 0 667 -2 691 -15z m-1838 -778 c58 -39 81 -84 77 -145 -6
--64 -29 -99 -89 -130 -52 -27 -101 -25 -153 7 -47 29 -80 99 -73 153 15 112
-147 176 238 115z m1833 9 c45 -19 85 -73 92 -127 8 -62 -27 -125 -86 -156
-l-43 -23 -644 0 c-704 0 -685 -2 -736 59 -68 81 -48 194 43 242 33 18 71 19
-688 19 535 0 659 -3 686 -14z"/>
-</g>
+                      <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                      fill="#606163" stroke="none">
+                      <path d="M3805 4786 c-37 -16 -70 -52 -84 -89 -6 -16 -11 -100 -11 -192 l0
+                      -163 -178 -4 c-178 -3 -179 -3 -215 -31 -69 -52 -87 -134 -46 -207 40 -70 72
+                      -80 268 -80 l171 0 0 -171 c0 -155 2 -175 21 -208 34 -59 64 -76 141 -76 60 0
+                      70 3 99 30 53 50 59 77 59 260 l0 165 174 0 c163 0 175 1 207 23 58 39 81 84
+                      77 145 -6 64 -29 99 -88 130 -41 20 -58 22 -206 22 l-163 0 -3 178 -3 179 -29
+                      37 c-46 61 -123 82 -191 52z"/>
+                      <path d="M1302 4639 c-135 -17 -268 -75 -383 -167 -117 -93 -197 -209 -252
+                      -366 l-32 -91 -3 -1495 c-2 -1339 -1 -1503 13 -1575 64 -318 323 -566 642
+                      -615 45 -7 454 -10 1238 -8 1309 4 1205 -2 1370 77 163 78 291 206 366 367 78
+                      166 73 54 76 1524 l3 1315 -25 -59 c-53 -129 -134 -214 -260 -273 -56 -26 -69
+                      -28 -186 -28 -125 0 -125 0 -202 38 -151 75 -246 205 -272 373 l-6 41 -67 12
+                      c-181 33 -331 172 -377 346 -44 170 9 352 136 469 51 48 94 73 189 114 30 13
+                      -1869 14 -1968 1z m350 -1254 c45 -34 71 -90 66 -145 -16 -162 -227 -201 -299
+                      -54 -37 77 -15 150 62 202 28 20 44 23 89 20 35 -2 66 -11 82 -23z m1827 10
+                      c110 -56 117 -212 13 -277 l-37 -23 -643 -3 c-423 -2 -656 1 -681 8 -47 12
+                      -96 65 -110 118 -18 64 12 136 72 172 31 19 55 20 695 20 563 0 667 -2 691
+                      -15z m-1839 -776 c53 -30 84 -88 78 -149 -16 -163 -227 -199 -299 -52 -67 137
+                      86 277 221 201z m1839 6 c68 -35 104 -119 82 -188 -15 -43 -68 -95 -112 -107
+                      -47 -14 -1272 -13 -1321 0 -44 13 -94 66 -107 118 -18 64 12 136 72 172 31 19
+                      55 20 695 20 563 0 667 -2 691 -15z m-1838 -778 c58 -39 81 -84 77 -145 -6
+                      -64 -29 -99 -89 -130 -52 -27 -101 -25 -153 7 -47 29 -80 99 -73 153 15 112
+                      147 176 238 115z m1833 9 c45 -19 85 -73 92 -127 8 -62 -27 -125 -86 -156
+                      l-43 -23 -644 0 c-704 0 -685 -2 -736 59 -68 81 -48 194 43 242 33 18 71 19
+                      688 19 535 0 659 -3 686 -14z"/>
+                      </g>
                     </svg>
                   <span className="font-medium pl-2 text-gray-600">Edit Projects</span>
                 </button>
@@ -406,27 +405,27 @@ l-43 -23 -644 0 c-704 0 -685 -2 -736 59 -68 81 -48 194 43 242 33 18 71 19
                   className={`flex items-center text-gray-700 w-full ${activeComponent === 'edit-person' ? 'font-bold' : ''}`}
                 >
                   <svg className="icon-toolbar" version="1.0" xmlns="http://www.w3.org/2000/svg"
- viewBox="0 0 512.000000 512.000000"
- preserveAspectRatio="xMidYMid meet">
+                    viewBox="0 0 512.000000 512.000000"
+                    preserveAspectRatio="xMidYMid meet">
 
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill="#606163" stroke="none">
-<path d="M2025 4789 c-221 -43 -405 -163 -525 -340 -97 -141 -134 -268 -134
--449 -1 -225 75 -410 229 -565 154 -154 340 -230 565 -230 225 0 411 76 565
-230 154 154 230 340 230 565 0 174 -36 297 -125 433 -112 173 -271 287 -480
-344 -68 18 -258 25 -325 12z"/>
-<path d="M1948 3025 c-412 -59 -773 -273 -1038 -616 -238 -308 -378 -689 -420
--1144 -17 -190 -27 -168 103 -230 426 -201 940 -347 1347 -384 172 -16 505
--10 524 10 3 2 23 83 46 179 l40 175 533 533 532 533 -39 72 c-244 456 -640
-760 -1116 857 -136 28 -375 35 -512 15z"/>
-<path d="M4251 2420 c-23 -5 -62 -20 -85 -34 -85 -50 -94 -33 156 -283 l226
--226 31 43 c92 128 75 308 -40 415 -27 26 -69 55 -92 65 -52 23 -138 31 -196
-20z"/>
-<path d="M3355 1600 l-620 -620 228 -227 227 -228 620 620 620 620 -228 228
--227 227 -620 -620z"/>
-<path d="M2666 800 c-11 -30 -104 -445 -101 -448 4 -4 448 98 455 104 2 3 -75
-84 -172 181 -120 120 -179 172 -182 163z"/>
-</g>
+                    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                    fill="#606163" stroke="none">
+                    <path d="M2025 4789 c-221 -43 -405 -163 -525 -340 -97 -141 -134 -268 -134
+                    -449 -1 -225 75 -410 229 -565 154 -154 340 -230 565 -230 225 0 411 76 565
+                    230 154 154 230 340 230 565 0 174 -36 297 -125 433 -112 173 -271 287 -480
+                    344 -68 18 -258 25 -325 12z"/>
+                    <path d="M1948 3025 c-412 -59 -773 -273 -1038 -616 -238 -308 -378 -689 -420
+                    -1144 -17 -190 -27 -168 103 -230 426 -201 940 -347 1347 -384 172 -16 505
+                    -10 524 10 3 2 23 83 46 179 l40 175 533 533 532 533 -39 72 c-244 456 -640
+                    760 -1116 857 -136 28 -375 35 -512 15z"/>
+                    <path d="M4251 2420 c-23 -5 -62 -20 -85 -34 -85 -50 -94 -33 156 -283 l226
+                    -226 31 43 c92 128 75 308 -40 415 -27 26 -69 55 -92 65 -52 23 -138 31 -196
+                    20z"/>
+                    <path d="M3355 1600 l-620 -620 228 -227 227 -228 620 620 620 620 -228 228
+                    -227 227 -620 -620z"/>
+                    <path d="M2666 800 c-11 -30 -104 -445 -101 -448 4 -4 448 98 455 104 2 3 -75
+                    84 -172 181 -120 120 -179 172 -182 163z"/>
+                    </g>
                   </svg>
                   <span className="font-medium pl-2 text-gray-600">Edit Persons</span>
                 </button>
@@ -436,8 +435,8 @@ fill="#606163" stroke="none">
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-8">
-          {renderComponent()}
+        <div className="flex-1 p-4">
+          {renderContent()}
         </div>
       </div>
 

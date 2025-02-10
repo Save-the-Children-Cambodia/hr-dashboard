@@ -4,6 +4,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import PrivateRoute from '../components/PrivateRoute';
 import AssignTasks from '../pages/AssignTasks';
+import Panhathun from '../components/Panhathun';
 
 const MainRoutes = () => {
   return (
@@ -15,6 +16,7 @@ const MainRoutes = () => {
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
         <Route path='/assign' element={<AssignTasks />} />
+        <Route path="/staff/:staffId" element={<Panhathun />} />
       </Route>
     </Routes>
   );

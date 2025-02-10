@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -22,38 +22,76 @@ ChartJS.register(
   Legend
 );
 
-const EmployeeList = () => {
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+const Panhathun = ({ staffId }) => {
+  const [staffData, setStaffData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStaffData = async () => {
+      try {
+        const staffResponse = await fetch('http://localhost:8000/api/staff/list/');
+        const tasksResponse = await fetch('http://localhost:8000/api/tasks/');
+        
+        const staffList = await staffResponse.json();
+        const tasksList = await tasksResponse.json();
+
+        // Find the specific staff member by ID
+        const staffMember = staffList.find(staff => staff.id === staffId);
+        
+        if (staffMember) {
+          const staffTasks = tasksList.filter(task => 
+            task.assigned_staff && task.assigned_staff.id === staffMember.id
+          );
+
+          // Calculate monthly task counts and average LOE
+          const monthlyData = Array(12).fill(0);
+          const monthlyLOE = Array(12).fill(staffMember.total_loe);
+          
+          staffTasks.forEach(task => {
+            const taskMonth = new Date(task.deadline).getMonth();
+            monthlyData[taskMonth]++;
+          });
+
+          setStaffData({
+            name: staffMember.staff_name,
+            taskData: monthlyData,
+            loeData: monthlyLOE
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+      setLoading(false);
+    };
+
+    if (staffId) {
+      fetchStaffData();
+    }
+  }, [staffId]);
 
   const data = {
-    labels: months,
+    labels: [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ],
     datasets: [
       {
-        label: 'Sales Performance',
-        data: [82, 85, 87, 89, 92, 95, 88, 86, 90, 93, 96, 98], 
+        label: 'Level of Effort (%)',
+        data: staffData?.loeData || [],
         fill: false,
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
-        tension: 0.1
+        tension: 0.1,
+        yAxisID: 'y'
       },
       {
-        label: 'Customer Satisfaction',
-        data: [75, 78, 76, 82, 84, 85, 87, 88, 86, 89, 90, 92], 
-        fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-        tension: 0.1
-      },
-      {
-        label: 'Task Completion Rate',
-        data: [95, 93, 94, 92, 96, 95, 97, 94, 95, 96, 98, 99], 
+        label: 'Number of Tasks',
+        data: staffData?.taskData || [],
         fill: false,
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        tension: 0.1
+        tension: 0.1,
+        yAxisID: 'y1'
       }
     ]
   };
@@ -63,18 +101,28 @@ const EmployeeList = () => {
     maintainAspectRatio: false,
     scales: {
       y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
         beginAtZero: true,
         max: 100,
         title: {
           display: true,
-          text: 'Percentage (%)'
+          text: 'Level of Effort (%)'
         }
       },
-      x: {
+      y1: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        beginAtZero: true,
         title: {
           display: true,
-          text: 'Month'
-        }
+          text: 'Number of Tasks'
+        },
+        grid: {
+          drawOnChartArea: false,
+        },
       }
     },
     plugins: {
@@ -83,14 +131,20 @@ const EmployeeList = () => {
       },
       title: {
         display: true,
-        text: 'Monthly Performance Chart'
+        text: 'Staff Performance Overview'
       }
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="bg-white shadow-lg rounded-3xl p-8 h-[calc(100vh-9rem)]">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">Duch Panhathun</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        {staffData?.name || 'Staff Member'}
+      </h1>
       <div className="w-full h-[calc(100%-5rem)]">
         <Line data={data} options={options} />
       </div>
@@ -98,4 +152,4 @@ const EmployeeList = () => {
   );
 };
 
-export default EmployeeList; 
+export default Panhathun; 
